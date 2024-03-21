@@ -19,7 +19,24 @@ This OpenWRT Custom Script For Modem
 <br>
 
 
+Tutor Singkat
+---
+1. Sebelum Memasukan Script Ini Di Crontabs Alangkah Baiknya Cek PING Internet Di CMD Terlebihdahulu
+   Cara Cek Ping Di Terminal OpenWrt "ping -I wwan0 bug.com"
+2. Tentang Variabel Untuk Di Edit
 
+   1. APN Modem = Masukan APN kalian Atau Samakan Dengan Di Interface Modem Manager Jika Menggunakan Modem Manager
+   2. Host / Bug Untuk Ping = Tempat Pengisian Host / Bug Untuk Cek Internet
+   3. Nama Interface Modem = Ini Untuk Interface Device Modem Biasanya Default wwan0
+   4. mInterface Modem = Port Modem Untuk AT Command
+   5. interface_modem = Nama Interface Modem
+   6. Port Modem = Ini Untuk Upaya Percobaan Sebelemum Eksekusi Restart Modem
+   7. Jumlah Percobaan = Default 1 Agar Balik ke Percobaan Pertama
+   8. Jeda Waktu Atau Delay / Bentuk Detik = Waktu / Jeda Sebelum Melanjutkan Eksekusi Berikutnya Untuk attempt Yang Ada Di Atas
+
+3. Button Save Untuk Menyimpan Konfigurasi
+4. Button Enable Untuk Mengaktifkan
+5. Button Disable Untuk Monenaktifkan
 
 Preview
 ---
