@@ -33,9 +33,9 @@ host="bug/ip"
 interface="wwan0"
 modem_port="/dev/ttyUSB0"
 interface_modem="mm"
-max_attempts=3
-attempt=1
-delay=10
+max_attempts="3"
+attempt="1"
+delay="10"
 #===============================
 
 # Berfungsi untuk memeriksa konektivitas internet

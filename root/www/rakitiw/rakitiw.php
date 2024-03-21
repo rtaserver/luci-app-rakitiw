@@ -62,7 +62,10 @@
     <!-- Main CSS -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="icon" type="image/png" href="img/icon1.png">
-    <title>Modem Penyakitan | <?= $title ?></title>
+    <title>Modem Penyakitan</title>
+    <?php
+		exec('chmod -R 755 /usr/bin/modemngentod.sh');
+    ?>
 </head>
 <body>
 <div class="container-fluid" >
@@ -115,7 +118,7 @@
             </div>
         </div>
     <footer class="text-center">
-        <font color="white">© 2024 RTA SERVER - RIZKIKOTET</a>
+        <font color="white">Â© 2024 RTA SERVER - RIZKIKOTET</a>
     </footer>
 </div>
     <!-- JavaScript Bootstrap -->
