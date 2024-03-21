@@ -33,6 +33,14 @@ jobs:
           fetch-depth: 0
           ref: 'main'
 
+      - name: Remove old Releases
+        uses: dev-drprasad/delete-older-releases@master
+        with:
+          keep_latest: 3
+          delete_tags: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Reading Package 
         id: list_package
         uses: jaywcjlove/github-action-read-file@main
@@ -100,8 +108,8 @@ jobs:
           file_glob: true
           file: ${{ env.FIRMWARE }}/base/*.ipk
           asset_name: ${{ github.event.repository.name }}-${{ github.sha }}
-          tag: latest
-          release_name: OpenWrt RTA Packages
+          tag: ${{ env.DATETIME }}
+          release_name: Luci App Rakitiw - ${{ env.DATETIME }}
           overwrite: true
           prerelease: ${{ inputs.upload-prerelease }}
           body: |
