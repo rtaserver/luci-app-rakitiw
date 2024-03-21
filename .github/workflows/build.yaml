@@ -36,7 +36,7 @@ jobs:
       - name: Remove old Releases
         uses: dev-drprasad/delete-older-releases@master
         with:
-          keep_latest: 3
+          keep_latest: 0
           delete_tags: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -108,7 +108,7 @@ jobs:
           file_glob: true
           file: ${{ env.FIRMWARE }}/base/*.ipk
           asset_name: ${{ github.event.repository.name }}-${{ github.sha }}
-          tag: ${{ env.DATETIME }}
+          tag: latest
           release_name: Luci App Rakitiw - ${{ env.DATETIME }}
           overwrite: true
           prerelease: ${{ inputs.upload-prerelease }}
