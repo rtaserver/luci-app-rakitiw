@@ -109,8 +109,12 @@
                             </div>
                             <!-- Tambahkan input lainnya di sini -->
                             <button type="submit" class="btn btn-primary">Simpan</button>
-                            <button type="submit" class="btn btn-success" name="enable">Enable</button>
-                            <button type="submit" class="btn btn-danger" name="disable">Disable</button> <p>
+                            <?php if ($status == 'Enabled'): ?>
+                                <button type="submit" class="btn btn-danger" name="disable">Disable</button>
+                            <?php else: ?>
+                                <button type="submit" class="btn btn-success" name="enable">Enable</button>
+                            <?php endif; ?>
+                            <p>
                             <p>Status: <span class="badge badge-primary"><?= $status ?></span></p>
                         </form>
                     </div>
