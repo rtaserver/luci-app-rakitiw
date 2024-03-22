@@ -33,14 +33,6 @@ jobs:
           fetch-depth: 0
           ref: 'main'
 
-      - name: Remove old Releases
-        uses: dev-drprasad/delete-older-releases@master
-        with:
-          keep_latest: 3
-          delete_tags: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Get PKG_VERSION from Makefile
         id: vars
         run: echo "::set-output name=version::$(grep 'PKG_VERSION:=' Makefile | cut -d '=' -f2)"
