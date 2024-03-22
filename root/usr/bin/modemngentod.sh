@@ -29,19 +29,26 @@
 #===============================
 flag_file="/tmp/.script_modemreconnect"
 apn="internet"
-host="google.com"
+host="google.com,8.8.8.8,1.1.1.1"
 interface="wwan0"
 modem_port="/dev/ttyUSB0"
 interface_modem="wan1"
-max_attempts="3"
+max_attempts="5"
 attempt="1"
-delay="30"
+delay="20"
 #===============================
 
 # Berfungsi untuk memeriksa konektivitas internet
 check_internet() {
-    ping -q -c 1 -W 1 -I ${interface} ${host} > /dev/null
-    return $?
+    for current_host in $(echo $host | tr "," "\n")
+    do
+        ping -q -c 1 -W 1 -I ${interface} ${current_host} > /dev/null
+        if [ $? -eq 0 ]
+        then
+            return 0
+        fi
+    done
+    return 1
 }
 
 # Fungsi untuk memeriksa apakah skrip sudah berjalan sebelumnya

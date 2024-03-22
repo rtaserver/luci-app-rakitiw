@@ -50,6 +50,33 @@
         $status = (strpos($output, '/usr/bin/modemngentod.sh') !== false) ? 'Enabled' : 'Disabled';
     }
 
+    $contnetwork = file_get_contents('/etc/config/network'); // Membaca isi file
+    $linesnetwork = explode("\n", $contnetwork); // Memisahkan setiap baris
+
+    $interface_modem = [];
+    foreach ($linesnetwork as $linenetwork) {
+        if (strpos($linenetwork, 'config interface') !== false) {
+            // Menemukan baris yang berisi 'config interface'
+            $parts = explode(' ', $linenetwork);
+            $interface = trim(end($parts), "'"); // Menghapus tanda petik
+            $interface_modem[] = $interface; // Menambahkan nama interface ke array
+        }
+    }
+
+    // Mendapatkan daftar device
+    $cmddevice = 'ip link show'; // Perintah untuk mendapatkan daftar device
+    $outdev = shell_exec($cmddevice); // Menjalankan perintah dan menyimpan outputnya
+
+    // Menguraikan output
+    $linesdevice = explode("\n", $outdev);
+    $device_modem = [];
+    foreach ($linesdevice as $linedevice) {
+        if (preg_match('/^\d+: (\w+):/', $linedevice, $matches)) {
+            $device_modem[] = $matches[1]; // Menambahkan nama device ke array
+        }
+    }
+
+
 ?>
 <!doctype html>
 <html lang="en">
@@ -78,14 +105,18 @@
                             <div class="body">
                                 <div class="text-center">
                                     <img src="curent.svg" alt="Curent Version">
-                                    <img alt="Latest Version" src="https://img.shields.io/github/v/release/rtaserver/luci-app-rakitiw?display_name=tag&style=for-the-badge&logo=openwrt&label=Latest%20Version&color=dark-green">
+                                    <img alt="Latest Version" src="https://img.shields.io/github/v/release/rtaserver/luci-app-rakitiw?display_name=tag&logo=openwrt&label=Latest%20Version&color=dark-green">
                                 </div>
                                 <br>  
                             </div>    
                             <div class="row">
                                 <div class="col-lg-6 col-md-6">
 									<i class="fa fa-inbox"></i>
-                                    <span class="text-primary">Status: </span><span :class="{ 'text-primary': connection === 0, 'text-warning': connection === 1, 'text-success': connection === 2, 'text-info': connection === 3 }"><?= $status ?></span>
+                                    <?php if ($status == 'Enabled'): ?>
+                                        <span class="text-primary">Status: </span><span class="text-success"><?= $status ?></span>
+                                    <?php else: ?>
+                                        <span class="text-primary">Status: </span><span class="text-danger"><?= $status ?></span>
+                                    <?php endif; ?>
                                 </div>
                                 <div class="col-lg-6 col-md-6">
 									<i class="fa fa-server"></i>
@@ -98,10 +129,6 @@
 								<div class="col-lg-6 col-md-6 pb-lg-1" >
 								<i class="fa fa-flag-o"></i>
                                     <span class="text-primary">Location	: {{ wan_country }}</span>
-                                </div>
-                                <div v-if="connection === 2" class="col-lg-6 col-md-6" >
-									<i class="fa fa-exchange"></i>
-                                    <span class="text-primary">TX|RX: </span><span class="text-primary">{{ total_data.tx }} | {{ total_data.rx }}</span>
                                 </div>
                                 <div class="col-lg-6 col-md-6 d-none d-lg-block d-xl-block">
 									<i class="fa fa-globe"></i>
@@ -119,20 +146,40 @@
                                 </div>
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
-                                        <label for="host">Host / Bug Untuk Ping</label>
-                                        <input type="text" class="form-control" placeholder="bug.com" id="host" name="host" value="<?= $variables['host'] ?>"required>
+                                        <label for="host">Host / Bug Untuk Ping | Support Multi Host</label>
+                                        <input type="text" class="form-control" placeholder="goole.com,xnxx.com,8.8.8.8,1.1.1.1 - Pisahkan Dengan koma" id="host" name="host" value="<?= $variables['host'] ?>"required>
                                     </div>
                                 </div>
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
                                         <label for="interface_modem">Nama Interface Modem</label>
-                                        <input type="text" class="form-control" placeholder="wan" id="interface_modem" name="interface_modem" value="<?= $variables['interface_modem'] ?>"required>
+                                        <select name="interface_modem" id="interface_modem" class="form-control" required>
+                                        <?php
+                                        foreach ($interface_modem as $interface) {
+                                            echo "<option value=\"$interface\"";
+                                            if ($interface == $variables['interface_modem']) {
+                                                echo " selected";
+                                            }
+                                        echo ">$interface</option>";
+                                        }
+                                        ?>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
-                                        <label for="interface">Interface Modem</label>
-                                        <input type="text" class="form-control" placeholder="wwan0" id="interface" name="interface" value="<?= $variables['interface'] ?>"required>
+                                        <label for="device_modem">Device Modem</label>
+                                        <select name="device_modem" id="device_modem" class="form-control" required>
+                                        <?php
+                                        foreach ($device_modem as $device) {
+                                            echo "<option value=\"$device\"";
+                                            if ($device == $variables['interface']) {
+                                                echo " selected";
+                                            }
+                                        echo ">$device</option>";
+                                        }
+                                        ?>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="col-lg-6 col-md-6">
