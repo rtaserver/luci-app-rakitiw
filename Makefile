@@ -3,14 +3,16 @@ include $(TOPDIR)/rules.mk
 LUCI_TITLE:=Auto Reconect Modem Rakitan
 PKG_NAME:=luci-app-rakitiw
 LUCI_DEPENDS:=
-PKG_VERSION:=1.0.5
+PKG_VERSION:=1.0.6
 
-define Package/$(PKG_NAME)/install
+define Package/$(PKG_NAME)/postinst
 #!/bin/sh
-chmod -R 755 /usr/bin/modemngentod.sh
-crontab -l | grep -v '/usr/bin/modemngentod.sh' | crontab -
+# cek jika ini adalah install atau upgrade
+if [ "$${IPKG_INSTROOT}" = "" ]; then
+    chmod -R 755 /usr/bin/modemngentod.sh
+    crontab -l | grep -v '/usr/bin/modemngentod.sh' | crontab -
+fi
 exit 0
-
 endef
 
 define Package/$(PKG_NAME)/prerm
