@@ -13,6 +13,17 @@ exit 0
 
 endef
 
+define Package/$(PKG_NAME)/prerm
+#!/bin/sh
+# cek jika ini adalah uninstall atau upgrade
+if [ "$${IPKG_INSTROOT}" = "" ]; then
+    if [ -z "$${UPGRADE}" ]; then
+        crontab -l | grep -v '/usr/bin/modemngentod.sh' | crontab -
+    fi
+fi
+exit 0
+endef
+
 include $(TOPDIR)/feeds/luci/luci.mk
 
 # call BuildPackage - OpenWrt buildroot signature
