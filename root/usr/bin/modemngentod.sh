@@ -68,6 +68,7 @@ while ! check_internet && [ $attempt -lt $max_attempts ]; do
     
     # Script untuk memperbarui IP
     echo  AT+CFUN=4 | atinout - "$modem_port" -
+    sleep 4
     echo  AT+CFUN=1 | atinout - "$modem_port" -
     modem_info=$(mmcli -L)
     modem_number=$(echo "$modem_info" | awk -F 'Modem/' '{print $2}' | awk '{print $1}')

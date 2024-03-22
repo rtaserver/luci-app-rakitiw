@@ -41,6 +41,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Get PKG_VERSION from Makefile
+        id: vars
+        run: echo "::set-output name=version::$(grep 'PKG_VERSION:=' Makefile | cut -d '=' -f2)"
+
       - name: Reading Package 
         id: list_package
         uses: jaywcjlove/github-action-read-file@main
@@ -108,12 +112,12 @@ jobs:
           file_glob: true
           file: ${{ env.FIRMWARE }}/base/*.ipk
           asset_name: ${{ github.event.repository.name }}-${{ github.sha }}
-          tag: latest
-          release_name: Luci App Rakitiw - ${{ env.DATETIME }}
+          tag: "${{ steps.vars.outputs.version }}"
+          release_name: "Luci App Rakitiw Version - ${{ steps.vars.outputs.version }} - ${{ env.DATETIME }}"
           overwrite: true
           prerelease: ${{ inputs.upload-prerelease }}
           body: |
-            Build date: ${{ env.DATETIME }}
+            Build date: ${{ env.DATETIME }} For Version : ${{ steps.vars.outputs.version }}
 
       - name: Delete workflow runs
         uses: Mattraks/delete-workflow-runs@v2.0.3
