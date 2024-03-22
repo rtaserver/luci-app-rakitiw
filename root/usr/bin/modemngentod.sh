@@ -29,13 +29,13 @@
 #===============================
 flag_file="/tmp/.script_modemreconnect"
 apn="internet"
-host="bug/ip"
+host="google.com"
 interface="wwan0"
 modem_port="/dev/ttyUSB0"
-interface_modem="mm"
+interface_modem="wan1"
 max_attempts="3"
 attempt="1"
-delay="10"
+delay="30"
 #===============================
 
 # Berfungsi untuk memeriksa konektivitas internet
