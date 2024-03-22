@@ -63,6 +63,7 @@
 <body>
 <div id="app">
     <?php include('navbar.php'); ?>
+    <form method="POST" class="mt-5">
     <div class="container-fluid" >
         <div class="row py-2">
             <div class="col-lg-8 col-md-9 mx-auto mt-3">
@@ -175,6 +176,7 @@
         </div>
         <?php include('footer.php'); ?>
     </div>
+    </form>
 </div>
 <?php include("javascript.php"); ?>
 <script src="js/index.js"></script>
