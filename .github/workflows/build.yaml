@@ -1,4 +1,4 @@
-name: Auto compile with openwrt sdk v1
+name: Build New IPK
 
 on:
   repository_dispatch:
@@ -21,6 +21,7 @@ on:
 
 env:
   TZ: Asia/Jakarta
+  GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
 jobs:
   job_build_rta:
@@ -111,10 +112,8 @@ jobs:
           body: |
             Build date: ${{ env.DATETIME }} For Version : ${{ steps.vars.outputs.version }}
 
-      - name: Delete workflow runs
-        uses: Mattraks/delete-workflow-runs@v2.0.3
+      - name: Delete Old Workflows
+        uses: Mattraks/delete-workflow-runs@main
         with:
-          token: ${{ github.token }}
-          repository: ${{ github.repository }}
-          retain_days: 1
-          keep_minimum_runs: 0
+          retain_days: 0
+          keep_minimum_runs: 1
