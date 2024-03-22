@@ -141,19 +141,19 @@
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
                                         <label for="apn">APN Modem</label>
-                                        <input type="text" class="form-control" placeholder="internet" id="apn" name="apn" value="<?= $variables['apn'] ?>"required>
+                                        <input type="text" class="form-control" placeholder="internet" id="apn" name="apn" value="<?= $variables['apn'] ?>"required <?php if ($status == 'Enabled') echo 'disabled'; ?>>
                                     </div>
                                 </div>
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
                                         <label for="host">Host / Bug Untuk Ping | Support Multi Host</label>
-                                        <input type="text" class="form-control" placeholder="goole.com,xnxx.com,8.8.8.8,1.1.1.1 - Pisahkan Dengan koma" id="host" name="host" value="<?= $variables['host'] ?>"required>
+                                        <input type="text" class="form-control" placeholder="goole.com,xnxx.com,8.8.8.8,1.1.1.1 - Pisahkan Dengan koma" id="host" name="host" value="<?= $variables['host'] ?>"required <?php if ($status == 'Enabled') echo 'disabled'; ?>>
                                     </div>
                                 </div>
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
                                         <label for="interface_modem">Nama Interface Modem</label>
-                                        <select name="interface_modem" id="interface_modem" class="form-control" required>
+                                        <select name="interface_modem" id="interface_modem" class="form-control"<?php if ($status == 'Enabled') echo 'disabled'; ?>>
                                         <?php
                                         foreach ($interface_modem as $interface) {
                                             echo "<option value=\"$interface\"";
@@ -169,7 +169,7 @@
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
                                         <label for="device_modem">Device Modem</label>
-                                        <select name="device_modem" id="device_modem" class="form-control" required>
+                                        <select name="device_modem" id="device_modem" class="form-control"<?php if ($status == 'Enabled') echo 'disabled'; ?>>
                                         <?php
                                         foreach ($device_modem as $device) {
                                             echo "<option value=\"$device\"";
@@ -185,19 +185,19 @@
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
                                         <label for="modem_port">Port Modem</label>
-                                        <input type="text" class="form-control" placeholder="/dev/ttyUSB0" id="modem_port" name="modem_port" value="<?= $variables['modem_port'] ?>"required>
+                                        <input type="text" class="form-control" placeholder="/dev/ttyUSB0" id="modem_port" name="modem_port" value="<?= $variables['modem_port'] ?>"required <?php if ($status == 'Enabled') echo 'disabled'; ?>>
                                     </div>
                                 </div>
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
                                         <label for="max_attempts">Jumlah Percobaan</label>
-                                        <input type="number" class="form-control" placeholder="3" id="max_attempts" name="max_attempts" value="<?= $variables['max_attempts'] ?>"required>
+                                        <input type="number" class="form-control" placeholder="3" id="max_attempts" name="max_attempts" value="<?= $variables['max_attempts'] ?>"required <?php if ($status == 'Enabled') echo 'disabled'; ?>>
                                     </div>
                                 </div>
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
                                         <label for="delay">Jeda Waktu Atau Delay / Bentuk Detik</label>
-                                        <input type="number" class="form-control" placeholder="10" id="delay" name="delay" value="<?= $variables['delay'] ?>"required>
+                                        <input type="number" class="form-control" placeholder="10" id="delay" name="delay" value="<?= $variables['delay'] ?>"required <?php if ($status == 'Enabled') echo 'disabled'; ?>>
                                     </div>
                                 </div>
                                 </div>
