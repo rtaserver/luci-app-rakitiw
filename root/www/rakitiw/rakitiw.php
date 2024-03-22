@@ -40,7 +40,9 @@
         $status = 'Enabled';
     } elseif (isset($_POST['disable'])) {
         // Hapus script dari cronjob
-        exec('crontab -l | grep -v "/usr/bin/modemngentod.sh" | crontab -');
+	exec('crontab -l | grep -v "/usr/bin/modemngentod.sh" | crontab -');
+	// Hapus file /tmp/.script_modemreconnect
+	exec('rm -f /tmp/.script_modemreconnect');
         $status = 'Disabled';
     } else {
         // Cek apakah script sudah ada di cronjob
