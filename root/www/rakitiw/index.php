@@ -95,11 +95,17 @@
     <script src="lib/vendor/jquery/jquery-3.6.0.slim.min.js"></script>
     <script>
     $(document).ready(function(){
-    setInterval(function(){
-        $("#logContent").load("log.php", function() {
-            var elem = document.getElementById('logContent');
-            elem.scrollTop = elem.scrollHeight;
-        });
+    var previousContent = "";
+        setInterval(function(){
+            $.get("log.php", function(data) {
+            // Jika konten berubah, lakukan update dan scroll
+                if (data !== previousContent) {
+                    previousContent = data;
+                    $("#logContent").html(data);
+                    var elem = document.getElementById('logContent');
+                    elem.scrollTop = elem.scrollHeight;
+                }
+            });
         }, 1000);
     });
     </script>
@@ -223,7 +229,7 @@
                                 </div>
                                 </div>
                                 <div class="col pt-2">
-                                    <pre id="logContent" class="form-control text-left" style="height: 150px; width: auto; font-size:80%; background-image-position: center; background-color: #141d26 "></pre>                                
+                                    <pre id="logContent" class="form-control text-left" style="height: 200px; width: auto; font-size:80%; background-image-position: center; background-color: #141d26 "></pre>                                
                                 </div>
                                 </div>
                             </div>
