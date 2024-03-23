@@ -1,4 +1,4 @@
-<script src="lib/vendor/jquery/jquery-3.6.0.slim.min.js"></script>
+<script src="lib/vendor/jquery/jquery-3.5.1.min.js"></script>
 <script src="lib/vendor/bootstrap/js/bootstrap.min.js"></script>
 <script src="lib/vendor/vuejs/vue.min.js"></script>
 <script src="lib/vendor/axios/axios.min.js"></script>

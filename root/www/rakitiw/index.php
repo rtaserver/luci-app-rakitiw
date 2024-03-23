@@ -17,7 +17,7 @@
     }
 
     // Cek apakah form disubmit
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['save'])) {
         // Update variabel dengan data dari form
         foreach ($_POST as $key => $value) {
             if (array_key_exists($key, $variables)) {
@@ -32,17 +32,23 @@
             }
         }
         file_put_contents($bash_file, $bash_content);
+        $log_message = shell_exec("date '+%Y-%m-%d %H:%M:%S'") . " - Script Telah Diperbaharui\n";
+        file_put_contents('/var/log/modemngentod.log', $log_message, FILE_APPEND);
     }
 
     if (isset($_POST['enable'])) {
         // Tambahkan script ke cronjob
         exec('(crontab -l; echo "* * * * * /usr/bin/modemngentod.sh") | crontab -');
+        $log_message = shell_exec("date '+%Y-%m-%d %H:%M:%S'") . " - Script Telah Di Aktifkan\n";
+        file_put_contents('/var/log/modemngentod.log', $log_message, FILE_APPEND);
         $status = 'Enabled';
     } elseif (isset($_POST['disable'])) {
         // Hapus script dari cronjob
-	exec('crontab -l | grep -v "/usr/bin/modemngentod.sh" | crontab -');
-	// Hapus file /tmp/.script_modemreconnect
-	exec('rm -f /tmp/.script_modemreconnect');
+	    exec('crontab -l | grep -v "/usr/bin/modemngentod.sh" | crontab -');
+	    // Hapus file /tmp/.script_modemreconnect
+	    exec('rm -f /tmp/.script_modemreconnect');
+        $log_message = shell_exec("date '+%Y-%m-%d %H:%M:%S'") . " - Script Telah Di Nonaktifkan\n";
+        file_put_contents('/var/log/modemngentod.log', $log_message, FILE_APPEND);
         $status = 'Disabled';
     } else {
         // Cek apakah script sudah ada di cronjob
@@ -86,6 +92,17 @@
         include("head.php");
 		exec('chmod -R 755 /usr/bin/modemngentod.sh');
     ?>
+    <script src="lib/vendor/jquery/jquery-3.6.0.slim.min.js"></script>
+    <script>
+    $(document).ready(function(){
+    setInterval(function(){
+        $("#logContent").load("log.php", function() {
+            var elem = document.getElementById('logContent');
+            elem.scrollTop = elem.scrollHeight;
+        });
+        }, 1000);
+    });
+    </script>
 </head>
 <body>
 <div id="app">
@@ -138,18 +155,21 @@
                             <br><div class="card-header"></div><br>					
                             <div class="card-body py-0 px-0">
                                 <div class="row">
+                                <?php if ($variables['modemmanager'] == 'false'): ?>
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
                                         <label for="apn">APN Modem</label>
                                         <input type="text" class="form-control" placeholder="internet" id="apn" name="apn" value="<?= $variables['apn'] ?>"required <?php if ($status == 'Enabled') echo 'disabled'; ?>>
                                     </div>
                                 </div>
+                                <?php endif; ?>
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
                                         <label for="host">Host / Bug Untuk Ping | Support Multi Host</label>
                                         <input type="text" class="form-control" placeholder="goole.com,xnxx.com,8.8.8.8,1.1.1.1 - Pisahkan Dengan koma" id="host" name="host" value="<?= $variables['host'] ?>"required <?php if ($status == 'Enabled') echo 'disabled'; ?>>
                                     </div>
                                 </div>
+                                <?php if ($variables['modemmanager'] == 'false'): ?>
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
                                         <label for="interface_modem">Nama Interface Modem</label>
@@ -166,14 +186,15 @@
                                         </select>
                                     </div>
                                 </div>
+                                <?php endif; ?>
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
-                                        <label for="device_modem">Device Modem</label>
+                                        <label for="device_modem">Device Modem Untuk Cek PING</label>
                                         <select name="device_modem" id="device_modem" class="form-control"<?php if ($status == 'Enabled') echo 'disabled'; ?>>
                                         <?php
                                         foreach ($device_modem as $device) {
                                             echo "<option value=\"$device\"";
-                                            if ($device == $variables['interface']) {
+                                            if ($device == $variables['device_modem']) {
                                                 echo " selected";
                                             }
                                         echo ">$device</option>";
@@ -184,7 +205,7 @@
                                 </div>
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
-                                        <label for="modem_port">Port Modem</label>
+                                        <label for="modem_port">Port Modem AT Command</label>
                                         <input type="text" class="form-control" placeholder="/dev/ttyUSB0" id="modem_port" name="modem_port" value="<?= $variables['modem_port'] ?>"required <?php if ($status == 'Enabled') echo 'disabled'; ?>>
                                     </div>
                                 </div>
@@ -196,9 +217,13 @@
                                 </div>
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
-                                        <label for="delay">Jeda Waktu Atau Delay / Bentuk Detik</label>
+                                        <label for="delay">Jeda Waktu Detik | Untuk Percobban Berikutnya</label>
                                         <input type="number" class="form-control" placeholder="10" id="delay" name="delay" value="<?= $variables['delay'] ?>"required <?php if ($status == 'Enabled') echo 'disabled'; ?>>
                                     </div>
+                                </div>
+                                </div>
+                                <div class="col pt-2">
+                                    <pre id="logContent" class="form-control text-left" style="height: 150px; width: auto; font-size:80%; background-image-position: center; background-color: #141d26 "></pre>                                
                                 </div>
                                 </div>
                             </div>
@@ -207,7 +232,7 @@
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
                                     <!-- Tambahkan input lainnya di sini -->
-                                    <button type="submit" class="btn btn-primary">Simpan</button>
+                                    <button type="submit" class="btn btn-primary" name="save"<?php if ($status == 'Enabled') echo 'disabled'; ?>>Simpan</button>
                                     <?php if ($status == 'Enabled'): ?>
                                         <button type="submit" class="btn btn-danger" name="disable">Disable</button>
                                     <?php else: ?>
