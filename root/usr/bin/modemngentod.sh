@@ -12,6 +12,7 @@ max_size=10 # Ukuran maksimum dalam KB
 file_size=$(du -k "$log_file" | cut -f1)
 if [ $file_size -gt $max_size ]; then
     rm "$log_file"
+    log "Log Lama Telah Di Hapus."
 fi
 
 # Variabel
