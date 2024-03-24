@@ -41,7 +41,6 @@ if (isset($_POST['save'])) {
     $script_content = file_get_contents($bash_file);
     $script_content = preg_replace('/modem_rakitan=".+"/', 'modem_rakitan="' . "Enabled" . '"', $script_content);
     file_put_contents($bash_file, $script_content);
-    // Hidupkan proses modemngentod.sh
     exec('/usr/bin/modemngentod.sh >/dev/null 2>&1 &');
 } elseif (isset($_POST['disable'])) {
     // Hentikan proses dengan nama modemngentod.sh menggunakan pkill
@@ -170,8 +169,8 @@ foreach ($linesdevice as $linedevice) {
                                 <?php endif; ?>
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
-                                        <label for="host">Host / Bug Untuk Ping | Support Multi Host</label>
-                                        <input type="text" class="form-control" placeholder="goole.com,xnxx.com,8.8.8.8,1.1.1.1 - Pisahkan Dengan koma" id="host" name="host" value="<?= $variables['host'] ?>"required <?php if ($variables['modem_rakitan'] == 'Enabled') echo 'disabled'; ?>>
+                                        <label for="host">Host / Bug Untuk Ping</label>
+                                        <input type="text" class="form-control" placeholder="goole.com - Single Host/IP" id="host" name="host" value="<?= $variables['host'] ?>"required <?php if ($variables['modem_rakitan'] == 'Enabled') echo 'disabled'; ?>>
                                     </div>
                                 </div>
                                 <?php if ($variables['modemmanager'] == 'false'): ?>
