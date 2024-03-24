@@ -1,24 +1,22 @@
 include $(TOPDIR)/rules.mk
 
-LUCI_TITLE:=Auto Reconect Modem Rakitan
+LUCI_TITLE:=Auto Reconnect Modem Rakitan
 PKG_NAME:=luci-app-rakitiw
 LUCI_DEPENDS:=
 PKG_VERSION:=1.1.1
 
 define Package/$(PKG_NAME)/postinst
 #!/bin/sh
-# cek jika ini adalah install atau upgrade
+# check if this is upgrade or reinstall
 if [ "$${IPKG_INSTROOT}" = "" ]; then
     chmod -R 755 /usr/bin/modemngentod.sh
-    if [ -z "$${UPGRADE}" ]; then
-        pid=$(pgrep -f modemngentod.sh) 
+    pid=$(pgrep -f modemngentod.sh) 
 
-        if [ -z "$pid" ]; then
-          echo "Process is not running."
-        else
-          kill $pid
-          echo "Process with PID $pid has been stopped."
-        fi
+    if [ -z "$$pid" ]; then
+        echo "Process is not running."
+    else
+        kill $$pid
+        echo "Process with PID $$pid has been stopped."
     fi
 fi
 exit 0
@@ -26,24 +24,20 @@ endef
 
 define Package/$(PKG_NAME)/prerm
 #!/bin/sh
-# cek jika ini adalah uninstall atau upgrade
-if [ "$${IPKG_INSTROOT}" = "" ]; then
-    if [ -z "$${UPGRADE}" ]; then
-        pid=$(pgrep -f modemngentod.sh) 
+# check if this is uninstall or upgrade
+if [ "$${IPKG_UPGRADE}" = "1" -o "$${IPKG_INSTROOT}" = "" ]; then
+    pid=$(pgrep -f modemngentod.sh) 
 
-        if [ -z "$pid" ]; then
-          echo "Process is not running."
-        else
-          kill $pid
-          echo "Process with PID $pid has been stopped."
-        fi
-
-        crontab -l | grep -v '/usr/bin/modemngentod.sh' | crontab -
+    if [ -z "$$pid" ]; then
+        echo "Process is not running."
+    else
+        kill $$pid
+        echo "Process with PID $$pid has been stopped."
     fi
+
+    crontab -l | grep -v '/usr/bin/modemngentod.sh' | crontab -
 fi
 exit 0
 endef
 
 include $(TOPDIR)/feeds/luci/luci.mk
-
-# call BuildPackage - OpenWrt buildroot signature
