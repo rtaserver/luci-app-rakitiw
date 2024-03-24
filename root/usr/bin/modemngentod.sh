@@ -11,10 +11,9 @@ log() {
 modem_rakitan="Disabled"
 #===============================
 modemmanager="true"
-flag_file="/tmp/.script_modemreconnect"
 apn="internet"
-host="google.com,1.1.1.1"
-device_modem="ppp0"
+host="google.com"
+device_modem="wwan0"
 modem_port="/dev/ttyUSB0"
 interface_modem="wan1"
 max_attempts="5"
@@ -46,34 +45,13 @@ if [ "$modem_rakitan" = "Enabled" ]; then
     while true; do
         # Berfungsi untuk memeriksa konektivitas internet
         check_internet() {
-            for current_host in $(echo $host | tr "," "\n")
-            do
-                ping -q -c 1 -W 1 -I ${device_modem} ${current_host} > /dev/null
-                if [ $? -eq 0 ]
-                then
-                    return 0
-                fi
-            done
-            return 1
-        }
-
-        # Fungsi untuk memeriksa apakah skrip sudah berjalan sebelumnya
-        check_previous_execution() {
-            if [ -e "$flag_file" ]; then
-                log "Skrip sudah berjalan sebelumnya. Tunggu sampai selesai atau hapus file $flag_file jika skrip sebelumnya tidak selesai."
-                #exit 1
+            if ping -c 1 $host &> /dev/null; then
+                return 0
             else
-                touch "$flag_file"
+                return 1
+                log "Host tidak dapat dijangkau."
             fi
         }
-
-        # Fungsi untuk membersihkan file penanda setelah skrip selesai
-        cleanup() {
-            rm -f "$flag_file"
-        }
-
-        # Memanggil fungsi pemeriksaan
-        check_previous_execution
 
         # Periksa konektivitas internet
         while ! check_internet && [ $attempt -lt $max_attempts ]; do
@@ -91,16 +69,10 @@ if [ "$modem_rakitan" = "Enabled" ]; then
         done
 
         if check_internet; then
-            log "Internet aktif. Keluar dari skrip..."
-            # Membersihkan file penanda setelah selesai
-            cleanup
-            # exit 0
+            log "Host dapat dijangkau. Melanjutkan ping..."
         else
             log "Upaya maksimal tercapai. Internet masih mati. Restart modem akan dijalankan"
             echo AT^RESET | atinout - "$modem_port" - && sleep 20 && ifdown "$interface_modem" && ifup "$interface_modem"
-            # Membersihkan file penanda setelah selesai
-            cleanup
-            # exit 1
         fi
         sleep 5  # Tunggu sebelum memeriksa koneksi lagi
     done
