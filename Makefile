@@ -3,7 +3,7 @@ include $(TOPDIR)/rules.mk
 LUCI_TITLE:=Auto Reconect Modem Rakitan
 PKG_NAME:=luci-app-rakitiw
 LUCI_DEPENDS:=
-PKG_VERSION:=1.1.0
+PKG_VERSION:=1.1.1
 
 define Package/$(PKG_NAME)/postinst
 #!/bin/sh
@@ -19,7 +19,15 @@ define Package/$(PKG_NAME)/prerm
 # cek jika ini adalah uninstall atau upgrade
 if [ "$${IPKG_INSTROOT}" = "" ]; then
     if [ -z "$${UPGRADE}" ]; then
-        pid=$(pgrep -f modemngentod.sh) && kill $pid
+        pid=$(pgrep -f modemngentod.sh) 
+
+        if [ -z "$pid" ]; then
+          echo "Process is not running."
+        else
+          kill $pid
+          echo "Process with PID $pid has been stopped."
+        fi
+
         crontab -l | grep -v '/usr/bin/modemngentod.sh' | crontab -
     fi
 fi
