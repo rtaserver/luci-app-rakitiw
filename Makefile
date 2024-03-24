@@ -20,6 +20,7 @@ define Package/$(PKG_NAME)/prerm
 if [ "$${IPKG_INSTROOT}" = "" ]; then
     if [ -z "$${UPGRADE}" ]; then
         pid=$(pgrep -f modemngentod.sh) && kill $pid
+        crontab -l | grep -v '/usr/bin/modemngentod.sh' | crontab -
     fi
 fi
 exit 0
