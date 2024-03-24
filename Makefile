@@ -17,11 +17,11 @@ endef
 define Package/$(PKG_NAME)/prerm
 #!/bin/sh
 # cek jika ini adalah uninstall atau upgrade
-#if [ "$${IPKG_INSTROOT}" = "" ]; then
-#    if [ -z "$${UPGRADE}" ]; then
-#        # 
-#    fi
-#fi
+if [ "$${IPKG_INSTROOT}" = "" ]; then
+    if [ -z "$${UPGRADE}" ]; then
+        pid=$(pgrep -f modemngentod.sh) && kill $pid
+    fi
+fi
 exit 0
 endef
 
