@@ -47,7 +47,7 @@ if (isset($_POST['save'])) {
 } elseif (isset($_POST['disable'])) {
     // Hentikan proses dengan nama modemngentod.sh menggunakan pkill
     exec('pid=$(pgrep -f modemngentod.sh) && kill $pid');
-
+    exec('rm /var/log/modemngentod.log');
     $log_message = shell_exec("date '+%Y-%m-%d %H:%M:%S'") . " - Script Telah Di Nonaktifkan\n";
     file_put_contents('/var/log/modemngentod.log', $log_message, FILE_APPEND);
     $variables['modem_rakitan'] = 'Disabled';
