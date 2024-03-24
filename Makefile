@@ -10,6 +10,16 @@ define Package/$(PKG_NAME)/postinst
 # cek jika ini adalah install atau upgrade
 if [ "$${IPKG_INSTROOT}" = "" ]; then
     chmod -R 755 /usr/bin/modemngentod.sh
+    if [ -z "$${UPGRADE}" ]; then
+        pid=$(pgrep -f modemngentod.sh) 
+
+        if [ -z "$pid" ]; then
+          echo "Process is not running."
+        else
+          kill $pid
+          echo "Process with PID $pid has been stopped."
+        fi
+    fi
 fi
 exit 0
 endef
