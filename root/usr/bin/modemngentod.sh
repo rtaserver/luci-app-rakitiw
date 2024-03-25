@@ -13,11 +13,11 @@ modem_rakitan="Disabled"
 modemmanager="true"
 apn="internet"
 host="google.com 1.1.1.1 facebook.com whatsapp.com"
-device_modem="wwan0"
+device_modem=""
 modem_port="/dev/ttyUSB0"
 interface_modem="wan1"
-max_attempts="5"
-attempt="1"
+max_attempts=5
+attempt=1
 delay="10"
 #===============================
 
@@ -44,11 +44,20 @@ if [ "$modem_rakitan" = "Enabled" ]; then
         status_Interrnet=false
 
         for pinghost in $host; do
-            if ping -c 1 "$pinghost" &> /dev/null; then
-                log "$pinghost dapat dijangkau"
-                status_Interrnet=true
+            if [ "$device_modem" = "" ]; then
+                if ping -c 1 "$pinghost" &> /dev/null; then
+                    log "$pinghost dapat dijangkau"
+                    status_Interrnet=true
+                else
+                    log "$pinghost tidak dapat dijangkau"
+                fi
             else
-                log "$pinghost tidak dapat dijangkau"
+                if ping -c 1 -I "$device_modem" "$pinghost" &> /dev/null; then
+                    log "$pinghost dapat dijangkau Dengan Interface $device_modem"
+                    status_Interrnet=true
+                else
+                    log "$pinghost tidak dapat dijangkau Dengan Interface $device_modem"
+                fi
             fi
         done
 
@@ -58,7 +67,6 @@ if [ "$modem_rakitan" = "Enabled" ]; then
         fi
 
         if ! $status_Interrnet; then
-            attempt=$((attempt + 1))
             log "Internet mati. Percobaan $attempt/$max_attempts"
             if [ "$attempt" = "2" ]; then
                 ifdown "$interface_modem"
@@ -76,6 +84,7 @@ if [ "$modem_rakitan" = "Enabled" ]; then
                 sleep 3      
             fi
             ifup "$interface_modem"
+            attempt=$((attempt + 1))
             sleep $delay
         fi
 

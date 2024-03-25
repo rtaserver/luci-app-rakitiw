@@ -195,7 +195,7 @@ foreach ($linesdevice as $linedevice) {
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
                                         <label for="device_modem">Device Modem Untuk Cek PING</label>
-                                        <input type="text" class="form-control" placeholder="10" id="device_modem" name="device_modem" value="<?= $variables['device_modem'] ?>"required <?php if ($variables['modem_rakitan'] == 'Enabled') echo 'disabled'; ?>>
+                                        <input type="text" class="form-control" placeholder="wwan0 Atau Di Kosongkan Default" id="device_modem" name="device_modem" value="<?= $variables['device_modem'] ?>" <?php if ($variables['modem_rakitan'] == 'Enabled') echo 'disabled'; ?>>
                                     </div>
                                 </div>
                                 <div class="col-lg-6 col-md-6">
