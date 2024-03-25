@@ -41,6 +41,15 @@ fi
 
 if [ "$modem_rakitan" = "Enabled" ]; then
     while true; do
+
+	log_size=$(wc -c < "$log_file")
+    	max_size=$((2 * 1024))
+    	if [ "$log_size" -gt "$max_size" ]; then
+            # Kosongkan isi file log
+            echo -n "" > "$log_file"
+            log "Log dibersihkan karena melebihi ukuran maksimum."
+        fi
+
         status_Interrnet=false
 
         for pinghost in $host; do
@@ -59,6 +68,13 @@ if [ "$modem_rakitan" = "Enabled" ]; then
                     log "$pinghost tidak dapat dijangkau Dengan Interface $device_modem"
                 fi
             fi
+
+            #if ping -c 1 "$pinghost" &> /dev/null; then
+            #    log "$pinghost dapat dijangkau"
+            #    status_Interrnet=true
+            #else
+            #    log "$pinghost tidak dapat dijangkau"
+            #fi
         done
 
         if $status_Interrnet; then
@@ -70,18 +86,18 @@ if [ "$modem_rakitan" = "Enabled" ]; then
             log "Internet mati. Percobaan $attempt/$max_attempts"
             if [ "$attempt" = "2" ]; then
                 ifdown "$interface_modem"
-                sleep 3
+                sleep 5
             elif [ "$attempt" = "3" ]; then
                 echo AT+CFUN=4 | atinout - "$modem_port" -
                 sleep 4
                 echo AT+CFUN=1 | atinout - "$modem_port" -
-                sleep 3
+                sleep 5
             elif [ "$attempt" = "4" ]; then
                 modem_info=$(mmcli -L)
                 modem_number=$(echo "$modem_info" | awk -F 'Modem/' '{print $2}' | awk '{print $1}')
                 mmcli -m "$modem_number" --simple-connect="apn=$apn"
                 ifdown "$interface_modem"
-                sleep 3      
+                sleep 5      
             fi
             ifup "$interface_modem"
             attempt=$((attempt + 1))
@@ -97,5 +113,6 @@ if [ "$modem_rakitan" = "Enabled" ]; then
     done
 else
     attempt=1
+    pid=$(pgrep -f modemngentod.sh) && kill $pid
     exit 1
 fi

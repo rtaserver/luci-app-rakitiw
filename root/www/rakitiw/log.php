@@ -1,14 +1,5 @@
 <?php
 $log_file = '/var/log/modemngentod.log';
-$file_size = filesize($log_file);
-$max_size = 100 * 1024; // 100KB
-
-if ($file_size > $max_size) {
-    if (unlink($log_file)) {
-        $log_message = shell_exec("date '+%Y-%m-%d %H:%M:%S'") . " - Log berhasil dihapus karena melebihi 100KB\n";
-        file_put_contents($log_file, $log_message, FILE_APPEND);
-    }
-}
 if (!file_exists($log_file)) {
     $log_message = shell_exec("date '+%Y-%m-%d %H:%M:%S'") . " - Belum Ada Log\n";
     file_put_contents($log_file, $log_message, FILE_APPEND);
