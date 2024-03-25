@@ -48,13 +48,3 @@ Preview
 <p align="center">
     <img src="pc.png">
 </p>
-
-* Main View
-<p align="center">
-    <img src="opwrt.png">
-</p>
-
-* Mobile View
-<p align="center">
-    <img src="mobile.png">
-</p>
