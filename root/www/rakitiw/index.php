@@ -206,12 +206,6 @@ foreach ($linesdevice as $linedevice) {
                                 </div>
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
-                                        <label for="max_attempts">Jumlah Percobaan</label>
-                                        <input type="number" class="form-control" placeholder="3" id="max_attempts" name="max_attempts" value="<?= $variables['max_attempts'] ?>"required <?php if ($variables['modem_rakitan'] == 'Enabled') echo 'disabled'; ?>>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 col-md-6">
-                                    <div class="form-group">
                                         <label for="delay">Jeda Waktu Detik | Untuk Percobban Berikutnya</label>
                                         <input type="number" class="form-control" placeholder="10" id="delay" name="delay" value="<?= $variables['delay'] ?>"required <?php if ($variables['modem_rakitan'] == 'Enabled') echo 'disabled'; ?>>
                                     </div>

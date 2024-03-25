@@ -41,52 +41,45 @@ fi
 
 if [ "$modem_rakitan" = "Enabled" ]; then
     while true; do
-        check_internet() {
-            local reachable=false
+        status_Interrnet=false
 
-            for pinghost in $host; do
-                if ping -c 1 "$pinghost" &> /dev/null; then
-                    log "$pinghost dapat dijangkau"
-                    reachable=true
-                else
-                    log "$pinghost tidak dapat dijangkau"
-                fi
-            done
-
-            if $reachable; then
-                return 0
+        for pinghost in $host; do
+            if ping -c 1 "$pinghost" &> /dev/null; then
+                log "$pinghost dapat dijangkau"
+                status_Interrnet=true
+            else
+                log "$pinghost tidak dapat dijangkau"
             fi
+        done
 
-            if ! $reachable; then
-                return 1
-            fi
-        }
+        if $status_Interrnet; then
+            attempt=1
+            log "Lanjut NgePING Croot"
+        fi
 
-        while ! check_internet && [ $attempt -lt $max_attempts ]; do
+        if ! $status_Interrnet; then
+            attempt=$((attempt + 1))
             log "Internet mati. Percobaan $attempt/$max_attempts"
             if [ "$attempt" = "2" ]; then
                 ifdown "$interface_modem"
                 sleep 3
-            elif ["$attempt" = "3"]; then
+            elif [ "$attempt" = "3" ]; then
                 echo AT+CFUN=4 | atinout - "$modem_port" -
                 sleep 4
                 echo AT+CFUN=1 | atinout - "$modem_port" -
                 sleep 3
-            elif ["$attempt" = "4"]; then
+            elif [ "$attempt" = "4" ]; then
                 modem_info=$(mmcli -L)
                 modem_number=$(echo "$modem_info" | awk -F 'Modem/' '{print $2}' | awk '{print $1}')
                 mmcli -m "$modem_number" --simple-connect="apn=$apn"
                 ifdown "$interface_modem"
-                sleep 3
+                sleep 3      
             fi
-            ifuf "$interface_modem"
+            ifup "$interface_modem"
             sleep $delay
-            ((attempt++))
-        done
+        fi
 
-        if check_internet; then
-            log "Host dapat dijangkau. Melanjutkan ping..."
-        else
+        if [ $attempt -ge $max_attempts ]; then
             log "Upaya maksimal tercapai. Internet masih mati. Restart modem akan dijalankan"
             echo AT^RESET | atinout - "$modem_port" - && sleep 20 && ifdown "$interface_modem" && ifup "$interface_modem"
             attempt=1
@@ -94,5 +87,6 @@ if [ "$modem_rakitan" = "Enabled" ]; then
         sleep 5
     done
 else
+    attempt=1
     exit 1
 fi
