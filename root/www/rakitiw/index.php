@@ -169,8 +169,8 @@ foreach ($linesdevice as $linedevice) {
                                 <?php endif; ?>
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
-                                        <label for="host">Host / Bug Untuk Ping</label>
-                                        <input type="text" class="form-control" placeholder="goole.com - Single Host/IP" id="host" name="host" value="<?= $variables['host'] ?>"required <?php if ($variables['modem_rakitan'] == 'Enabled') echo 'disabled'; ?>>
+                                        <label for="host">Host / Bug Untuk Ping | Multi Host</label>
+                                        <input type="text" class="form-control" placeholder="goole.com facebook.com whatsapp.com" id="host" name="host" value="<?= $variables['host'] ?>"required <?php if ($variables['modem_rakitan'] == 'Enabled') echo 'disabled'; ?>>
                                     </div>
                                 </div>
                                 <?php if ($variables['modemmanager'] == 'false'): ?>

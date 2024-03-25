@@ -12,7 +12,7 @@ modem_rakitan="Disabled"
 #===============================
 modemmanager="true"
 apn="internet"
-host="google.com"
+host="google.com 1.1.1.1 facebook.com whatsapp.com"
 device_modem="wwan0"
 modem_port="/dev/ttyUSB0"
 interface_modem="wan1"
@@ -45,11 +45,21 @@ if [ "$modem_rakitan" = "Enabled" ]; then
     while true; do
         # Berfungsi untuk memeriksa konektivitas internet
         check_internet() {
-            if ping -c 1 $host &> /dev/null; then
-                return 0
-            else
+            local reachable=false
+
+            for pinghost in $host; do
+                if ping -c 1 "$pinghost" &> /dev/null; then
+                    log "$pinghost dapat dijangkau"
+                    return 0
+                    reachable=true
+                else
+                    log "$pinghost tidak dapat dijangkau"
+                fi
+            done
+
+            if ! $reachable; then
                 return 1
-                log "Host tidak dapat dijangkau."
+                log "Tidak ada host yang dapat dijangkau."
             fi
         }
 
