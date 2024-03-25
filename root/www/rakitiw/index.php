@@ -225,6 +225,7 @@ foreach ($linesdevice as $linedevice) {
                                     <?php if ($variables['modem_rakitan'] == 'Enabled'): ?>
                                         <button type="submit" class="btn btn-danger" name="disable">Disable</button>
                                     <?php else: ?>
+                                        <?php exec('pid=$(pgrep -f modemngentod.sh) && kill $pid'); ?>
                                         <button type="submit" class="btn btn-success" name="enable">Enable</button>
                                     <?php endif; ?>
                                     </div>
