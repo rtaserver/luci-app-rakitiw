@@ -19,12 +19,11 @@ This OpenWRT Custom Script For Modem
 <br>
 
 
-Tutor Singkat
+Tutor Install Dan Upgrade
 ---
 1. Sebelum Memasukan Script Ini Di Crontabs Alangkah Baiknya Cek PING Internet Di CMD Terlebihdahulu
    Cara Cek Ping Di Terminal OpenWrt "ping -I wwan0 bug.com"
 2. Tentang Variabel Untuk Di Edit
-
    1. APN Modem = Masukan APN kalian Atau Samakan Dengan Di Interface Modem Manager Jika Menggunakan Modem Manager
    2. Host / Bug Untuk Ping = Tempat Pengisian Host / Bug Untuk Cek Internet
    3. Nama Interface Modem = Ini Untuk Interface Device Modem Biasanya Default wwan0
@@ -37,6 +36,9 @@ Tutor Singkat
 3. Button Save Untuk Menyimpan Konfigurasi
 4. Button Enable Untuk Mengaktifkan
 5. Button Disable Untuk Monenaktifkan
+
+
+## INFO : Jika Update Jangan Lupa Disable Terlebihdahulu :)
 
 Preview
 ---
