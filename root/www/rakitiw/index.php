@@ -35,6 +35,7 @@ if (isset($_POST['save'])) {
     $log_message = shell_exec("date '+%Y-%m-%d %H:%M:%S'") . " - Script Telah Diperbaharui\n";
     file_put_contents('/var/log/modemngentod.log', $log_message, FILE_APPEND);
 } elseif (isset($_POST['enable'])) {
+    exec('pid=$(pgrep -f modemngentod.sh) && kill $pid');
     $log_message = shell_exec("date '+%Y-%m-%d %H:%M:%S'") . " - Script Telah Di Aktifkan\n";
     file_put_contents('/var/log/modemngentod.log', $log_message, FILE_APPEND);
     $variables['modem_rakitan'] = 'Enabled';
@@ -194,17 +195,7 @@ foreach ($linesdevice as $linedevice) {
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
                                         <label for="device_modem">Device Modem Untuk Cek PING</label>
-                                        <select name="device_modem" id="device_modem" class="form-control"<?php if ($variables['modem_rakitan'] == 'Enabled') echo 'disabled'; ?>>
-                                        <?php
-                                        foreach ($device_modem as $device) {
-                                            echo "<option value=\"$device\"";
-                                            if ($device == $variables['device_modem']) {
-                                                echo " selected";
-                                            }
-                                        echo ">$device</option>";
-                                        }
-                                        ?>
-                                        </select>
+                                        <input type="text" class="form-control" placeholder="10" id="device_modem" name="device_modem" value="<?= $variables['device_modem'] ?>"required <?php if ($variables['modem_rakitan'] == 'Enabled') echo 'disabled'; ?>>
                                     </div>
                                 </div>
                                 <div class="col-lg-6 col-md-6">
