@@ -42,7 +42,7 @@ fi
 if [ "$modem_rakitan" = "Enabled" ]; then
     while true; do
 
-	log_size=$(wc -c < "$log_file")
+	    log_size=$(wc -c < "$log_file")
     	max_size=$((2 * 1024))
     	if [ "$log_size" -gt "$max_size" ]; then
             # Kosongkan isi file log
@@ -68,13 +68,6 @@ if [ "$modem_rakitan" = "Enabled" ]; then
                     log "$pinghost tidak dapat dijangkau Dengan Interface $device_modem"
                 fi
             fi
-
-            #if ping -c 1 "$pinghost" &> /dev/null; then
-            #    log "$pinghost dapat dijangkau"
-            #    status_Interrnet=true
-            #else
-            #    log "$pinghost tidak dapat dijangkau"
-            #fi
         done
 
         if $status_Interrnet; then
