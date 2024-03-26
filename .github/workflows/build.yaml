@@ -39,7 +39,9 @@ jobs:
 
       - name: Get PKG_VERSION from Makefile
         id: vars
-        run: echo "::set-output name=version::$(grep 'PKG_VERSION:=' Makefile | cut -d '=' -f2)"
+        run: |
+          PKG_VERSION=$(grep 'PKG_VERSION:=' Makefile | cut -d '=' -f2)
+          echo "version=${PKG_VERSION}" >> $GITHUB_ENV
 
       - name: Reading Package 
         id: list_package
@@ -102,25 +104,27 @@ jobs:
 
       - name: Read CHANGELOG.md
         id: changelog
-        run: echo "::set-output name=changelog::$(cat CHANGELOG.md)"
+        run: |
+          echo "CHANGELOG:" > changelog.txt
+          cat CHANGELOG.md >> changelog.txt
+          echo "::set-output name=changelog::$(cat changelog.txt)"
 
       - name: Upload Firmware to Release
-        if: ${{ !github.event.inputs.upload-artifacts }}
         uses: svenstaro/upload-release-action@v2
+        if: github.event.inputs.upload-artifacts == 'false'
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file_glob: true
           file: ${{ env.FIRMWARE }}/base/*.ipk
           asset_name: ${{ github.event.repository.name }}-${{ github.sha }}
-          tag: "${{ steps.vars.outputs.version }}"
-          release_name: "Luci App Rakitiw Version - ${{ steps.vars.outputs.version }} - ${{ env.DATETIME }}"
+          tag: "${{ env.version }}"
+          release_name: "Luci App Rakitiw Version - ${{ env.version }} - ${{ env.DATETIME }}"
           overwrite: true
           prerelease: ${{ inputs.upload-prerelease }}
           body: |
-            Build date: ${{ env.DATETIME }} For Version : ${{ steps.vars.outputs.version }}
-      
-            CHANGELOG:
-            ${{ steps.changelog.outputs.changelog }}      
+            Build date: ${{ env.DATETIME }} For Version : ${{ env.version }}
+        
+            ${{ steps.changelog.outputs.changelog }}  
 
       - name: Delete Old Workflows
         uses: Mattraks/delete-workflow-runs@main
