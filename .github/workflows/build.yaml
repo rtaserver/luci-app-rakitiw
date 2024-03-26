@@ -105,8 +105,8 @@ jobs:
         run: echo "::set-output name=changelog::$(cat CHANGELOG.md)"
 
       - name: Upload Firmware to Release
+        if: ${{ !github.event.inputs.upload-artifacts }}
         uses: svenstaro/upload-release-action@v2
-        if: github.event.inputs.upload-artifacts == 'false'
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file_glob: true
@@ -118,9 +118,9 @@ jobs:
           prerelease: ${{ inputs.upload-prerelease }}
           body: |
             Build date: ${{ env.DATETIME }} For Version : ${{ steps.vars.outputs.version }}
-
+      
             CHANGELOG:
-            ${{ steps.changelog.outputs.changelog }}
+            ${{ steps.changelog.outputs.changelog }}      
 
       - name: Delete Old Workflows
         uses: Mattraks/delete-workflow-runs@main
