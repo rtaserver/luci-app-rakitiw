@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - 'Makefile'
+    branches:
+      - dev
 
 jobs:
   update:
@@ -11,22 +13,44 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
+      
+      - name: Set up Git
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      
       - name: Get PKG_VERSION from Makefile
         id: pkg_version
         run: |
           VERSION=$(grep -oP 'PKG_VERSION:=\K.*' Makefile)
           echo "::set-output name=version::$VERSION"
-      
+            
       - name: Update SVG file
         run: |
           sed -r -i 's/(aria-label="Curent Version: v)[0-9]+\.[0-9]+\.[0-9]+/\1${{ steps.pkg_version.outputs.version }}/g' root/www/rakitiw/curent.svg
           sed -r -i 's/(<text x="1315" y="140" transform="scale\(.1\)" fill="#fff" textLength="350">v)[0-9]+\.[0-9]+\.[0-9]+/\1${{ steps.pkg_version.outputs.version }}/g' root/www/rakitiw/curent.svg
-
-      - name: Commit and push if it changed
+      
+      - name: Check if SVG file changed
+        id: check_svg_changes
         run: |
-          git diff
+          git diff --exit-code --quiet || echo "SVG file has changed"
+            
+      - name: Commit and push if SVG file changed
+        if: steps.check_svg_changes.outputs.stdout
+        run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           git commit -am "Update SVG version" || exit 0
           git push
+            
+      - name: Create Pull Request
+        if: steps.check_svg_changes.outputs.stdout
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          git pull origin main
+          git checkout main
+          git pull origin dev
+          git push origin main
+          git checkout dev
+          gh pr create --base main --head dev --title "Auto Pull Request from dev to main" --body "This is an automatic pull request from dev to main triggered by the Update SVG Version action."
