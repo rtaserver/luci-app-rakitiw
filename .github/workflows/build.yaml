@@ -1,6 +1,9 @@
 name: Build New IPK
 
 on:
+  push:
+    branches:
+      - main
   repository_dispatch:
   workflow_dispatch:
     inputs:
@@ -97,6 +100,10 @@ jobs:
           name: OpenWrt RTA Packages
           path: ${{ env.FIRMWARE }}/base/*.ipk
 
+      - name: Read CHANGELOG.md
+        id: changelog
+        run: echo "::set-output name=changelog::$(cat CHANGELOG.md)"
+
       - name: Upload Firmware to Release
         uses: svenstaro/upload-release-action@v2
         if: github.event.inputs.upload-artifacts == 'false'
@@ -111,6 +118,9 @@ jobs:
           prerelease: ${{ inputs.upload-prerelease }}
           body: |
             Build date: ${{ env.DATETIME }} For Version : ${{ steps.vars.outputs.version }}
+
+            CHANGELOG:
+            ${{ steps.changelog.outputs.changelog }}
 
       - name: Delete Old Workflows
         uses: Mattraks/delete-workflow-runs@main
