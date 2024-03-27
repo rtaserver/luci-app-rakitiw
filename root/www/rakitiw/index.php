@@ -67,19 +67,6 @@ foreach ($linesnetwork as $linenetwork) {
         $interface_modem[] = $interface; // Menambahkan nama interface ke array
     }
 }
-
-// Mendapatkan daftar device
-$cmddevice = 'ip link show'; // Perintah untuk mendapatkan daftar device
-$outdev = shell_exec($cmddevice); // Menjalankan perintah dan menyimpan outputnya
-
-// Menguraikan output
-$linesdevice = explode("\n", $outdev);
-$device_modem = [];
-foreach ($linesdevice as $linedevice) {
-    if (preg_match('/^\d+: (\w+):/', $linedevice, $matches)) {
-        $device_modem[] = $matches[1]; // Menambahkan nama device ke array
-    }
-}
 ?>
 
 <!doctype html>
@@ -160,21 +147,18 @@ foreach ($linesdevice as $linedevice) {
                             </div><br>					
                             <div class="card-body py-0 px-0">
                                 <div class="row">
-                                <?php if ($variables['modemmanager'] == 'false'): ?>
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
                                         <label for="apn">APN Modem</label>
                                         <input type="text" class="form-control" placeholder="internet" id="apn" name="apn" value="<?= $variables['apn'] ?>"required <?php if ($variables['modem_rakitan'] == 'Enabled') echo 'disabled'; ?>>
                                     </div>
                                 </div>
-                                <?php endif; ?>
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
                                         <label for="host">Host / Bug Untuk Ping | Multi Host</label>
                                         <input type="text" class="form-control" placeholder="goole.com facebook.com whatsapp.com" id="host" name="host" value="<?= $variables['host'] ?>"required <?php if ($variables['modem_rakitan'] == 'Enabled') echo 'disabled'; ?>>
                                     </div>
                                 </div>
-                                <?php if ($variables['modemmanager'] == 'false'): ?>
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
                                         <label for="interface_modem">Nama Interface Modem</label>
@@ -191,7 +175,6 @@ foreach ($linesdevice as $linedevice) {
                                         </select>
                                     </div>
                                 </div>
-                                <?php endif; ?>
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
                                         <label for="device_modem">Device Modem Untuk Cek PING</label>

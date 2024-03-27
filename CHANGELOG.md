@@ -1,6 +1,11 @@
 ## NEXT SCHEDULE
 - Penambahan Untuk Modem HP
 
+## Changelog V1.1.7
+- Menghapus Auto Detect Modem Manager
+- Ganti Metode Untuk PING
+- Perbaikan Di MakeFile
+
 ## Changelog V1.1.6
 - Fix PING
 
