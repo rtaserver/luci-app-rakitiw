@@ -13,6 +13,9 @@
             <li class="nav-item <?php if ($url === 'index.php') echo 'active'; ?>">
                 <a class="nav-link" href="index.php"><i class="fa fa-home"></i> Home <span class="sr-only">(current)</span></a>
             </li>
+            <li class="nav-item <?php if ($url === 'hostip.php') echo 'active'; ?>">
+                <a class="nav-link" href="hostip.php"><i class="fa fa-info"></i> Hostname To IP</a>
+            </li>
             <li class="nav-item <?php if ($url === 'about.php') echo 'active'; ?>">
                 <a class="nav-link" href="about.php"><i class="fa fa-info"></i> About</a>
             </li>
