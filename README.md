@@ -30,7 +30,7 @@ Tutor Install Dan Upgrade
   7. Setelah Selesai Silahkan Cek Pada Bagian Tab Modem
   8. Jika Tidak Muncul Bisa Akses Manual Di : http://192.168.1.1/rakitiw - sesuaikan dengan IP OpenWrt Masing-Masing
 
-## INFO : Jika Update Jangan Lupa Disable Terlebihdahulu :)
+## INFO : Jika Update Jangan Lupa Disable Terlebihdahulu :) Kalo Mau Aman Bisa Disable Terus Uninstall Baru Install Yang Baru
 ---
 1. Sebelum Memasukan Script Ini Di Crontabs Alangkah Baiknya Cek PING Internet Di CMD Terlebihdahulu
    Cara Cek Ping Di Terminal OpenWrt "ping -I wwan0 bug.com"
