@@ -32,9 +32,10 @@ jobs:
           git diff --exit-code --quiet || echo "SVG file has changed"
             
       - name: Commit and push if SVG file changed
-        if: steps.check_svg_changes.outputs.stdout
+        if: steps.check_svg_changes.outputs.stdout != ''
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
-          git commit -am "Update SVG version" || exit 0
+          git add root/www/rakitiw/current.svg
+          git commit -m "Update SVG version"
           git push
