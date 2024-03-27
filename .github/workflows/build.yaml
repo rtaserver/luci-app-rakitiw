@@ -40,8 +40,8 @@ jobs:
       - name: Get PKG_VERSION from Makefile
         id: vars
         run: |
-          PKG_VERSION=$(grep 'PKG_VERSION:=' Makefile | cut -d '=' -f2)
-          echo "version=${PKG_VERSION}" >> $GITHUB_ENV
+          VERSION=$(grep -oP 'PKG_VERSION:=\K.*' Makefile)
+          echo "::set-output name=version::$VERSION"
 
       - name: Reading Package 
         id: list_package
@@ -102,12 +102,16 @@ jobs:
           name: OpenWrt RTA Packages
           path: ${{ env.FIRMWARE }}/base/*.ipk
 
-      - name: Read CHANGELOG.md
+      - name: Add changelog info to new release description
         id: changelog
+        shell: bash
         run: |
-          echo "CHANGELOG:" > changelog.txt
-          cat CHANGELOG.md >> changelog.txt
-          echo "::set-output name=changelog::$(cat changelog.txt)"
+          cd $WORKING_DIR
+          r=$(awk '/^\*\*Changelog\*\*/ {if(found) exit; found=1} found' CHANGELOG.md)
+          r="${r//'%'/'%25'}"
+          r="${r//$'\n'/'%0A'}"
+          r="${r//$'\r'/'%0D'}"  
+          echo "CHANGELOG=$r" >> $GITHUB_OUTPUT
 
       - name: Upload Firmware to Release
         uses: svenstaro/upload-release-action@v2
@@ -117,14 +121,14 @@ jobs:
           file_glob: true
           file: ${{ env.FIRMWARE }}/base/*.ipk
           asset_name: ${{ github.event.repository.name }}-${{ github.sha }}
-          tag: "${{ env.version }}"
-          release_name: "Luci App Rakitiw Version - ${{ env.version }} - ${{ env.DATETIME }}"
+          tag: "${{ steps.vars.outputs.version }}"
+          release_name: "Luci App Rakitiw Version - ${{ github.event.repository.name }} - ${{ env.DATETIME }}"
           overwrite: true
           prerelease: ${{ inputs.upload-prerelease }}
           body: |
-            Build date: ${{ env.DATETIME }} For Version : ${{ env.version }}
+            Build date: ${{ env.DATETIME }} For Version : ${{ github.event.repository.name }}
         
-            ${{ steps.changelog.outputs.changelog }}  
+            ${{ steps.changelog.outputs.CHANGELOG }}
 
       - name: Delete Old Workflows
         uses: Mattraks/delete-workflow-runs@main
