@@ -1,15 +1,12 @@
-## NEXT SCHEDULE
-- Penambahan Untuk Modem HP
-
-## Changelog V1.1.7
+**Changelog** V1.1.7
 - Menghapus Auto Detect Modem Manager
 - Ganti Metode Untuk PING
 - Perbaikan Di MakeFile
 
-## Changelog V1.1.6
+**Changelog** V1.1.6
 - Fix PING
 
-## Changelog V1.1.5 Stable
+**Changelog** V1.1.5 Stable
 - Update Bash Script
 - Ganti Mentode Untuk Modem Manager
 - Perbaikan Script Tidak Jalan
@@ -17,7 +14,7 @@
 - Penambahan Otomatis Hapus Log
 - Perbaikan Kecil Lainnya
 
-## Changelog V1.1.3
+**Changelog** V1.1.3
 - Update Bash Script
 - Fix Running
 - Auto Detect

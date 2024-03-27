@@ -85,8 +85,9 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ./release/*
           overwrite: true
-          tag: ${{ steps.pkg_version.outputs.version }}
+          tag: "test-${{ steps.pkg_version.outputs.version }}"
           file_glob: true
+          prerelease: true
           body: |
             # LUCI APP RAKITIW ${{ steps.pkg_version.outputs.version }}
             Simple Mange Modem Rakitan
