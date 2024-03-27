@@ -35,7 +35,7 @@ jobs:
         run: |
               echo ""
               mkdir feeds artifacts
-              cp -rf * ./feeds
+              cp -rf ./* ./feeds
         
       - name: Building Luci Rakitiw
         uses: nosignals/gh-action-sdk@main
