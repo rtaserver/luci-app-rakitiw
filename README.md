@@ -21,6 +21,17 @@ This OpenWRT Custom Script For Modem
 
 Tutor Install Dan Upgrade
 ---
+### Install : 
+  1. Download File IPK : https://github.com/rtaserver/luci-app-rakitiw/releases/latest
+  2. Pada Bagian Assets Pilih File luci-app-rakitiw_{VersiApp}_all.ipk
+  3. Login OpenWrt -> Masuk Ke Tab System -> Software
+  4. Klik Update List Tunggu Hingga Selesai Update
+  5. Klik Upload Package -> Browse -> Pilih .ipk Yang Sudah Di Download Tadi -> Kilik Upload -> Klik Install
+  7. Setelah Selesai Silahkan Cek Pada Bagian Tab Modem
+  8. Jika Tidak Muncul Bisa Akses Manual Di : http://192.168.1.1/rakitiw - sesuaikan dengan IP OpenWrt Masing-Masing
+
+## INFO : Jika Update Jangan Lupa Disable Terlebihdahulu :)
+---
 1. Sebelum Memasukan Script Ini Di Crontabs Alangkah Baiknya Cek PING Internet Di CMD Terlebihdahulu
    Cara Cek Ping Di Terminal OpenWrt "ping -I wwan0 bug.com"
 2. Tentang Variabel Untuk Di Edit
@@ -38,7 +49,7 @@ Tutor Install Dan Upgrade
 5. Button Disable Untuk Monenaktifkan
 
 
-## INFO : Jika Update Jangan Lupa Disable Terlebihdahulu :)
+
 
 Preview
 ---

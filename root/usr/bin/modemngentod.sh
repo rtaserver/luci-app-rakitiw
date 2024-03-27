@@ -10,7 +10,6 @@ log() {
 # Variabel
 modem_rakitan="Disabled"
 #===============================
-modemmanager="true"
 apn="internet"
 host="google.com 1.1.1.1 facebook.com whatsapp.com"
 device_modem=""
@@ -24,18 +23,9 @@ delay="10"
 cfg_nodemmanager=$(awk '/option proto '"'"'modemmanager'"'"'/ {print NR}' /etc/config/network)
 
 if [ -z "$cfg_nodemmanager" ]; then
-    modemmanager="true"
-    log "Interface Modemmanager tidak ditemukan Menggunakan Manual Detect."
+    apn=$apn
 else
-    log "Interface Modemmanager ditemukan."
-    modemmanager="true"
-    # Dapatkan nama interface
-    cfg_interface=$(awk -v cfg_nodemmanager=$cfg_nodemmanager 'NR==cfg_nodemmanager-1 {print $3}' /etc/config/network | tr -d "'")
-
-    # Dapatkan nilai apn
     cfg_apn=$(awk -v cfg_nodemmanager=$cfg_nodemmanager 'NR>cfg_nodemmanager {if ($1=="option" && $2=="apn") print $3; if ($1=="config") exit}' /etc/config/network | tr -d "'")
-
-    interface_modem=$cfg_interface
     apn=$cfg_apn
 fi
 
@@ -54,14 +44,14 @@ if [ "$modem_rakitan" = "Enabled" ]; then
 
         for pinghost in $host; do
             if [ "$device_modem" = "" ]; then
-                if ping -c 1 "$pinghost" &> /dev/null; then
+                if curl -s -m 5 http://$pinghost &> /dev/null; then
                     log "$pinghost dapat dijangkau"
                     status_Interrnet=true
                 else
                     log "$pinghost tidak dapat dijangkau"
                 fi
             else
-                if ping -c 1 -I "$device_modem" "$pinghost" &> /dev/null; then
+                if curl -s -m 5 --interface $device_modem http://$pinghost &> /dev/null; then
                     log "$pinghost dapat dijangkau Dengan Interface $device_modem"
                     status_Interrnet=true
                 else

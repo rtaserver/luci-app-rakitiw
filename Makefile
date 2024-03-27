@@ -3,7 +3,7 @@ include $(TOPDIR)/rules.mk
 LUCI_TITLE:=Auto Reconect Modem Rakitan
 PKG_NAME:=luci-app-rakitiw
 LUCI_DEPENDS:=
-PKG_VERSION:=1.1.6
+PKG_VERSION:=1.1.7
 
 define Package/$(PKG_NAME)/postinst
 #!/bin/sh
