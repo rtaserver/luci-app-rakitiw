@@ -1,6 +1,7 @@
 name: Update SVG Version
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'Makefile'
@@ -12,12 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-      
-      - name: Set up Git
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
+        uses: actions/checkout@main
       
       - name: Get PKG_VERSION from Makefile
         id: pkg_version
@@ -42,15 +38,3 @@ jobs:
           git config --global user.name "GitHub Action"
           git commit -am "Update SVG version" || exit 0
           git push
-            
-      - name: Create Pull Request
-        if: steps.check_svg_changes.outputs.stdout
-        run: |
-          git config --global user.email "action@github.com"
-          git config --global user.name "GitHub Action"
-          git pull origin main
-          git checkout main
-          git pull origin dev
-          git push origin main
-          git checkout dev
-          gh pr create --base main --head dev --title "Auto Pull Request from dev to main" --body "This is an automatic pull request from dev to main triggered by the Update SVG Version action."
