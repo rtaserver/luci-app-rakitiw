@@ -1,9 +1,9 @@
 name: Build New IPK
 
 on:
-  push:
-    branches:
-      - main
+  #push:
+  #  branches:
+  #    - main
   repository_dispatch:
   workflow_dispatch:
     inputs:
