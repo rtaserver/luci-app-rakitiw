@@ -1,0 +1,2 @@
+config rakitiw 'cfg'
+	option startup '0'

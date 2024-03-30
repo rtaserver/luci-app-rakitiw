@@ -6,6 +6,19 @@
         include("head.php");
     ?>
     <script src="lib/vendor/jquery/jquery-3.6.0.slim.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $("form").on("submit", function(e) {
+                e.preventDefault();
+                var hostname = $("#hostname").val();
+                $("button[type='submit']").prop("disabled", true);
+                $.get("get_ip.php", { hostname: hostname }, function(data) {
+                    $(".result").html(data);
+                    $("button[type='submit']").prop("disabled", false);
+                });
+            });
+        });
+    </script>
 </head>
 <body>
 <div id="app">
@@ -30,27 +43,13 @@
                                 <br>  
                             </div>    
                             <div class="container">
-                                <h1 class="mt-5">Hostname to IP Converter</h1>
-                                <form method="post" class="mt-4">
-                                    <div class="form-group">
-                                        <label for="hostname">Masukan Hostname:</label>
-                                        <input type="text" class="form-control" id="hostname" name="hostname" required>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Convert</button>
-                                </form>
-                                <?php
-                                if ($_SERVER["REQUEST_METHOD"] == "POST") {
-                                    $hostname = $_POST["hostname"];
-                                    $api_url = "http://ip-api.com/json/$hostname";
-                                    $response = file_get_contents($api_url);
-                                    $data = json_decode($response, true);
-                                    if ($data["status"] == "fail") {
-                                        echo "<p class='mt-3 text-danger'>Error: " . $data["message"] . "</p>";
-                                    } else {
-                                        echo "<p class='mt-3'>IP Address for $hostname: " . $data["query"] . "</p>";
-                                    }
-                                }
-                                ?>
+                                <h1 class="mt-5">Hostname to IP Converter</h1>                              
+                                <div class="form-group">
+                                    <label for="hostname">Masukan Hostname:</label>
+                                    <input type="text" class="form-control" id="hostname" name="hostname" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Convert</button>
+                                <div class="result mt-3"></div>                               
                             </div>
                         </div>
                     </div>

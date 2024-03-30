@@ -1,0 +1,16 @@
+#!/bin/sh
+
+echo "Setup Rakitiw"
+mm1="/usr/lib/ModemManager/connection.d/10-report-down"
+mm2="/usr/lib/ModemManager/connection.d/10-report-down-and-reconnect"
+
+if [ -f "$mm1" ]; then
+    rm /usr/lib/ModemManager/connection.d/10-report-down
+fi
+if [ -f "$mm2" ]; then
+    rm /usr/lib/ModemManager/connection.d/10-report-down-and-reconnect
+fi
+
+mv "/usr/lib/ModemManager/connection.d/rakitiw" "/usr/lib/ModemManager/connection.d/10-report-down-and-reconnect"
+chmod +x /usr/lib/ModemManager/connection.d/10-report-down-and-reconnect
+echo "Setup Done"
