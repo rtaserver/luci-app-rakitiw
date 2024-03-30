@@ -41,7 +41,7 @@ jobs:
         run: |
               echo ""
               mkdir feeds artifacts
-              find . -mindepth 1 -maxdepth 1 ! -name 'feeds' -exec cp -r {} feeds/ \;
+              find . -mindepth 1 -maxdepth 1 ! -path './feeds' ! -path './artifacts' -exec cp -rf {} feeds/ \;
         
       - name: Building Luci Rakitiw
         uses: nosignals/gh-action-sdk@main
