@@ -8,8 +8,6 @@ PKG_MAINTAINER:=rtaserver <https://github.com/rtaserver/luci-app-rakitiw>
 PKG_NAME:=luci-app-rakitiw
 PKG_VERSION:=1.1.8
 
-PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
-
 define Package/$(PKG_NAME)
 	CATEGORY:=LuCI
 	SUBMENU:=3. Applications
@@ -22,47 +20,36 @@ define Package/$(PKG_NAME)/description
     A LuCI support for rakitan
 endef
 
-include $(INCLUDE_DIR)/package.mk
-
-define Build/Prepare
-	mkdir -p $(PKG_BUILD_DIR)
-	$(CP) $(CURDIR)/root $(PKG_BUILD_DIR)
-	$(CP) $(CURDIR)/luasrc $(PKG_BUILD_DIR)
-	chmod 0755 $(PKG_BUILD_DIR)/root/etc/init.d/rakitiw
-	chmod 0755 $(PKG_BUILD_DIR)/root/usr/bin/modemngentod.sh
-	chmod 0755 $(PKG_BUILD_DIR)/root/etc/uci-defaults/99_rakitiw
-endef
-
-define Build/Configure
-endef
-
-define Build/Compile
-endef
-
-define Package/$(PKG_NAME)/preinst
+define Package/$(PKG_NAME)/postinst
 #!/bin/sh
-if [ -f "/etc/config/rakitiw" ]; then
-	/usr/bin/modemngentod.sh -k
+# cek jika ini adalah install atau upgrade
+if [ "$${IPKG_INSTROOT}" = "" ]; then
+    chmod -R 755 /usr/bin/modemngentod.sh
+    if pgrep -f "modemngentod.sh" > /dev/null; then
+        echo "Menghentikan proses..."
+        pkill -f "modemngentod.sh"
+        echo "Proses telah dihentikan."
+    fi
 fi
 exit 0
 endef
 
-define Package/$(PKG_NAME)/postinst
-
-endef
-
 define Package/$(PKG_NAME)/prerm
 #!/bin/sh
-/usr/bin/modemngentod.sh -k
+# cek jika ini adalah uninstall atau upgrade
+if [ "$${IPKG_INSTROOT}" = "" ]; then
+    if [ -z "$${UPGRADE}" ]; then
+        if pgrep -f "modemngentod.sh" > /dev/null; then
+            echo "Menghentikan proses..."
+            pkill -f "modemngentod.sh"
+            echo "Proses telah dihentikan."
+        fi
+        crontab -l | grep -v '/usr/bin/modemngentod.sh' | crontab -
+    fi
+fi
 exit 0
 endef
 
-define Package/$(PKG_NAME)/postrm
+include $(TOPDIR)/feeds/luci/luci.mk
 
-endef
-
-define Package/$(PKG_NAME)/install
-
-endef
-
-$(eval $(call BuildPackage,$(PKG_NAME)))
+# call BuildPackage - OpenWrt buildroot signature
