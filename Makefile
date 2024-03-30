@@ -15,7 +15,7 @@ define Package/$(PKG_NAME)
 	SUBMENU:=3. Applications
 	TITLE:=LuCI support for rakitan
 	PKGARCH:=all
-	DEPENDS:=+kmod-tun +bash +curl +jq +modemmanager +luci-proto-modemmanager
+	DEPENDS:=
 endef
 
 define Package/$(PKG_NAME)/description
