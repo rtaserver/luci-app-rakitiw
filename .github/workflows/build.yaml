@@ -26,7 +26,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-          ref: 'main'
+          ref: ${{ github.ref }}
 
       - name: Get PKG_VERSION from Makefile
         id: vars
@@ -76,7 +76,7 @@ jobs:
         run: |
           cd sdk
           for package in ${{ steps.list_package.outputs.content}}; do
-            make "package/$package/compile"
+            make -j1 V=s "package/$package/compile"
           done
           mv bin/packages/x86_64/base/ ../
           cd ..
