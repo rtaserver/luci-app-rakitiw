@@ -1,0 +1,24 @@
+#!/bin/sh /etc/rc.common
+# (C) 2024 rtaserver
+
+START=99
+
+BIN="/usr/bin/modemngentod.sh"
+
+start() {
+    if [ "$(uci get rakitiw.cfg.startup)" = "1" ]; then
+        sleep 1 && $BIN -s
+    else
+}
+
+restart() {
+    $BIN -r
+}
+
+stop_service() {
+    $BIN -k
+}
+
+stop() {
+    $BIN -k
+}

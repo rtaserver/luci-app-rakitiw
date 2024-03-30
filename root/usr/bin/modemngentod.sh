@@ -8,7 +8,6 @@ log() {
 }
 
 # Variabel
-modem_rakitan="Disabled"
 #===============================
 apn="internet"
 host="google.com 1.1.1.1 facebook.com whatsapp.com"
@@ -20,6 +19,7 @@ attempt=1
 delay="10"
 #===============================
 
+rakitiw_start() {
 cfg_nodemmanager=$(awk '/option proto '"'"'modemmanager'"'"'/ {print NR}' /etc/config/network)
 
 if [ -z "$cfg_nodemmanager" ]; then
@@ -29,7 +29,6 @@ else
     apn=$cfg_apn
 fi
 
-if [ "$modem_rakitan" = "Enabled" ]; then
     while true; do
 
 	    log_size=$(wc -c < "$log_file")
@@ -94,8 +93,34 @@ if [ "$modem_rakitan" = "Enabled" ]; then
         fi
         sleep 5
     done
-else
-    attempt=1
-    pid=$(pgrep -f modemngentod.sh) && kill $pid
-    exit 1
-fi
+}
+
+rakitiw_stop() {
+    # Hentikan skrip jika sedang berjalan
+    if [ -f /var/run/modemngentod.pid ]; then
+        kill $(cat /var/run/modemngentod.pid)
+        rm /var/run/modemngentod.pid
+    else
+        echo "Rakitiw is not running."
+    fi
+}
+
+rakitiw_restart() {
+    rakitiw_stop
+    sleep 2
+    rakitiw_start
+}
+
+while getopts ":skrpcvh" rakitiw ; do
+    case $rakitiw in
+        s)
+            rakitiw_start
+            ;;
+        k)
+            rakitiw_stop
+            ;;
+        r)
+            rakitiw_restart
+            ;;
+    esac
+done

@@ -1,41 +1,72 @@
+# See /LICENSE for more information.
+# This is free software, licensed under the GNU General Public License v3.
+# Copyright (C) 2024 rtaserver
+
 include $(TOPDIR)/rules.mk
 
-LUCI_TITLE:=Auto Reconect Modem Rakitan
+PKG_MAINTAINER:=rtaserver <https://github.com/rtaserver/luci-app-rakitiw>
 PKG_NAME:=luci-app-rakitiw
-LUCI_DEPENDS:=
-PKG_VERSION:=1.1.7
+PKG_VERSION:=1.1.8
 
-define Package/$(PKG_NAME)/postinst
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
+
+define Package/$(PKG_NAME)
+	CATEGORY:=LuCI
+	SUBMENU:=3. Applications
+	TITLE:=LuCI support for rakitan
+	PKGARCH:=all
+	DEPENDS:=+kmod-tun +bash +curl +jq +modemmanager +luci-proto-modemmanager
+endef
+
+define Package/$(PKG_NAME)/description
+    A LuCI support for rakitan
+endef
+
+include $(INCLUDE_DIR)/package.mk
+
+define Build/Prepare
+	mkdir -p $(PKG_BUILD_DIR)
+	$(CP) $(CURDIR)/root $(PKG_BUILD_DIR)
+	$(CP) $(CURDIR)/luasrc $(PKG_BUILD_DIR)
+	chmod 0755 $(PKG_BUILD_DIR)/root/etc/init.d/rakitiw
+	chmod 0755 $(PKG_BUILD_DIR)/root/usr/bin/modemngentod.sh
+	chmod 0755 $(PKG_BUILD_DIR)/root/etc/uci-defaults/99_rakitiw
+endef
+
+define Build/Configure
+endef
+
+define Build/Compile
+endef
+
+define Package/$(PKG_NAME)/preinst
 #!/bin/sh
-# cek jika ini adalah install atau upgrade
-if [ "$${IPKG_INSTROOT}" = "" ]; then
-    chmod -R 755 /usr/bin/modemngentod.sh
-    if pgrep -f "modemngentod.sh" > /dev/null; then
-        echo "Menghentikan proses..."
-        pkill -f "modemngentod.sh"
-        echo "Proses telah dihentikan."
-    fi
+if [ -f "/etc/config/rakitiw" ]; then
+	/usr/bin/modemngentod.sh -k
 fi
 exit 0
+endef
+
+define Package/$(PKG_NAME)/postinst
+
 endef
 
 define Package/$(PKG_NAME)/prerm
 #!/bin/sh
-# cek jika ini adalah uninstall atau upgrade
-if [ "$${IPKG_INSTROOT}" = "" ]; then
-    if [ -z "$${UPGRADE}" ]; then
-        if pgrep -f "modemngentod.sh" > /dev/null; then
-            echo "Menghentikan proses..."
-            pkill -f "modemngentod.sh"
-            echo "Proses telah dihentikan."
-        fi
-        crontab -l | grep -v '/usr/bin/modemngentod.sh' | crontab -
-    fi
-fi
+/usr/bin/modemngentod.sh -k
 exit 0
 endef
 
-include $(TOPDIR)/feeds/luci/luci.mk
+define Package/$(PKG_NAME)/postrm
 
-# call BuildPackage - OpenWrt buildroot signature
+endef
 
+define Package/$(PKG_NAME)/install
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci
+	$(INSTALL_DIR) $(1)/www/rakitiw
+	$(CP) $(PKG_BUILD_DIR)/root/* $(1)/
+	$(CP) $(PKG_BUILD_DIR)/luasrc/* $(1)/usr/lib/lua/luci/
+	$(CP) $(PKG_BUILD_DIR)/www/* $(1)/www/
+endef
+
+$(eval $(call BuildPackage,$(PKG_NAME)))

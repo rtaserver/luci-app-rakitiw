@@ -35,17 +35,14 @@ if (isset($_POST['save'])) {
     $log_message = shell_exec("date '+%Y-%m-%d %H:%M:%S'") . " - Script Telah Diperbaharui\n";
     file_put_contents('/var/log/modemngentod.log', $log_message, FILE_APPEND);
 } elseif (isset($_POST['enable'])) {
-    exec('pid=$(pgrep -f modemngentod.sh) && kill $pid');
     $log_message = shell_exec("date '+%Y-%m-%d %H:%M:%S'") . " - Script Telah Di Aktifkan\n";
     file_put_contents('/var/log/modemngentod.log', $log_message, FILE_APPEND);
     $variables['modem_rakitan'] = 'Enabled';
     $script_content = file_get_contents($bash_file);
     $script_content = preg_replace('/modem_rakitan=".+"/', 'modem_rakitan="' . "Enabled" . '"', $script_content);
     file_put_contents($bash_file, $script_content);
-    exec('/usr/bin/modemngentod.sh >/dev/null 2>&1 &');
+    exec('/usr/bin/modemngentod.sh -s');
 } elseif (isset($_POST['disable'])) {
-    // Hentikan proses dengan nama modemngentod.sh menggunakan pkill
-    exec('pid=$(pgrep -f modemngentod.sh) && kill $pid');
     exec('rm /var/log/modemngentod.log');
     $log_message = shell_exec("date '+%Y-%m-%d %H:%M:%S'") . " - Script Telah Di Nonaktifkan\n";
     file_put_contents('/var/log/modemngentod.log', $log_message, FILE_APPEND);
@@ -53,6 +50,7 @@ if (isset($_POST['save'])) {
     $script_content = file_get_contents($bash_file);
     $script_content = preg_replace('/modem_rakitan=".+"/', 'modem_rakitan="' . "Disabled" . '"', $script_content);
     file_put_contents($bash_file, $script_content);
+    exec('/usr/bin/modemngentod.sh -k');
 }
 
 $contnetwork = file_get_contents('/etc/config/network'); // Membaca isi file
