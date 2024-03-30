@@ -6,6 +6,12 @@ on:
       - main
   repository_dispatch:
   workflow_dispatch:
+    inputs:
+      prerelease:
+        description: 'Pre Release'
+        required: true
+        default: false
+        type: boolean
 
 env:
   TZ: Asia/Jakarta
@@ -97,6 +103,7 @@ jobs:
           asset_name: ${{ github.event.repository.name }}-${{ github.sha }}
           tag: "${{ steps.vars.outputs.version }}"
           release_name: "Luci App Rakitiw Version - ${{ github.event.repository.name }} - ${{ env.DATETIME }}"
+          prerelease: ${{ inputs.prerelease }}
           overwrite: true
           body: |
             Build date: ${{ env.DATETIME }} For Version : ${{ github.event.repository.name }}
