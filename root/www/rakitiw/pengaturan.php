@@ -1,10 +1,11 @@
 <?php
 if(isset($_POST['rakitiw'])){
     $dt = $_POST['rakitiw'];
-    if ($dt == 'enable') shell_exec("uci set rakitiw.cfg.startup='1' && uci commit rakitiw");
-    if ($dt == 'disable') shell_exec("uci set rakitiw.cfg.startup='0' && uci commit rakitiw");
+    if ($dt == 'enable') exec("uci set rakitiw.cfg.startup='1' && uci commit rakitiw");
+    if ($dt == 'disable') exec("uci set rakitiw.cfg.startup='0' && uci commit rakitiw");
 }
 
+$startup_status = exec("uci -q get rakitiw.cfg.startup");
 
 ?>
 
@@ -57,8 +58,11 @@ if(isset($_POST['rakitiw'])){
                             <form action="index.php" method="post">
                             <td class="d-grid">
                                 <div class="btn-group col" role="group" aria-label="ctrl">
-                                    <button type="submit" name="rakitiw" value="enable" class="btn btn<?php if($startup_status==1) echo "-outline" ?>-success <?php if($startup_status==1) echo "disabled" ?> d-grid">Enable Startup</button>
-                                    <button type="submit" name="rakitiw" value="disable" class="btn btn<?php if($startup_status==0) echo "-outline" ?>-danger <?php if($startup_status==0) echo "disabled" ?> d-grid">Disable Startup</button>
+                                <?php if($startup_status == 1): ?>
+                                    <button type="submit" name="rakitiw" value="enable" class="btn btn-danger">Disable Startup</button>
+                                <?php else: ?>
+                                    <button type="submit" name="rakitiw" value="disable" class="btn btn-success">Enable Startup</button>
+                                <?php endif; ?>
                                 </div>
                             </td>
                             </form>

@@ -1,3 +1,8 @@
+**Changelog** V1.1.9
+- Penambahan Startup
+- Penambahan Tools Host To IP
+- Perbaikan Di MakeFile
+
 **Changelog** V1.1.7
 - Menghapus Auto Detect Modem Manager
 - Ganti Metode Untuk PING

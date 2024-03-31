@@ -10,7 +10,4 @@
         echo json_encode($resp, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
 
-    // Mendapatkan status startup saat halaman dimuat
-    $startup_status = exec("uci -q get rakitiw.cfg.startup");
-
 ?>
