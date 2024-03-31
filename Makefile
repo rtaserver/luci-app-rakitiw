@@ -7,7 +7,7 @@ include $(TOPDIR)/rules.mk
 PKG_MAINTAINER:=rtaserver <https://github.com/rtaserver/luci-app-rakitiw>
 PKG_NAME:=luci-app-rakitiw
 PKG_VERSION:=1.1.8
-PKG_DEPENDS:=
+PKG_DEPENDS:=+bash
 LUCI_TITLE:=LuCI support for Rakitan
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
@@ -21,12 +21,6 @@ define Build/Prepare
 	chmod 0755 $(PKG_BUILD_DIR)/root/etc/init.d/rakitiw
 	chmod 0755 $(PKG_BUILD_DIR)/root/usr/bin/modemngentod.sh
 	chmod 0755 $(PKG_BUILD_DIR)/root/etc/uci-defaults/99_rakitiw
-endef
-
-define Build/Configure
-endef
-
-define Build/Compile
 endef
 
 define Package/$(PKG_NAME)/preinst

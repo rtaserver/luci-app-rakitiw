@@ -8,7 +8,7 @@ BIN="/usr/bin/modemngentod.sh"
 start() {
     if [ "$(uci get rakitiw.cfg.startup)" = "1" ]; then
         sleep 1 && $BIN -s
-    else
+    fi
 }
 
 restart() {
