@@ -8,7 +8,6 @@ PKG_MAINTAINER:=rtaserver <https://github.com/rtaserver/luci-app-rakitiw>
 PKG_NAME:=luci-app-rakitiw
 PKG_VERSION:=1.1.8
 PKG_DEPENDS:=+bash
-LUCI_TITLE:=LuCI support for Rakitan
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
 
@@ -50,7 +49,7 @@ endef
 
 define Package/$(PKG_NAME)/postrm
 #!/bin/sh
-	rm -rf /etc/config/rakitiw >/dev/null 2>&1
+	rm -f /etc/config/rakitiw >/dev/null 2>&1
 	rm -rf /www/rakitiw/ >/dev/null 2>&1
 	exit 0
 endef
