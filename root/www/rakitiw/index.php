@@ -15,6 +15,7 @@ for ($i = 0; $i < count($matches[1]); $i++) {
         $variables[$matches[1][$i]] = $matches[2][$i];
     }
 }
+$rakitiw_status=exec("uci -q get rakitiw.cfg.status");
 
 // Cek apakah form disubmit
 if (isset($_POST['save'])) {
@@ -37,21 +38,16 @@ if (isset($_POST['save'])) {
 } elseif (isset($_POST['enable'])) {
     $log_message = shell_exec("date '+%Y-%m-%d %H:%M:%S'") . " - Script Telah Di Aktifkan\n";
     file_put_contents('/var/log/modemngentod.log', $log_message, FILE_APPEND);
-    $variables['modem_rakitan'] = 'Enabled';
-    $script_content = file_get_contents($bash_file);
-    $script_content = preg_replace('/modem_rakitan=".+"/', 'modem_rakitan="' . "Enabled" . '"', $script_content);
-    file_put_contents($bash_file, $script_content);
+    shell_exec("uci set rakitiw.cfg.status='Enabled' && uci commit rakitiw");
     exec('/usr/bin/modemngentod.sh -s');
 } elseif (isset($_POST['disable'])) {
     exec('rm /var/log/modemngentod.log');
     $log_message = shell_exec("date '+%Y-%m-%d %H:%M:%S'") . " - Script Telah Di Nonaktifkan\n";
     file_put_contents('/var/log/modemngentod.log', $log_message, FILE_APPEND);
-    $variables['modem_rakitan'] = 'Disabled';
-    $script_content = file_get_contents($bash_file);
-    $script_content = preg_replace('/modem_rakitan=".+"/', 'modem_rakitan="' . "Disabled" . '"', $script_content);
-    file_put_contents($bash_file, $script_content);
+    shell_exec("uci set rakitiw.cfg.status='Disabled' && uci commit rakitiw");
     exec('/usr/bin/modemngentod.sh -k');
 }
+
 
 $contnetwork = file_get_contents('/etc/config/network'); // Membaca isi file
 $linesnetwork = explode("\n", $contnetwork); // Memisahkan setiap baris
@@ -118,10 +114,10 @@ foreach ($linesnetwork as $linenetwork) {
                             <div class="row">
                                 <div class="col-lg-6 col-md-6">
 									<i class="fa fa-inbox"></i>
-                                    <?php if ($variables['modem_rakitan'] == 'Enabled'): ?>
-                                        <span class="text-primary">Status: </span><span class="text-success"><?= $variables['modem_rakitan'] ?></span>
+                                    <?php if ($rakitiw_status == 'Enabled'): ?>
+                                        <span class="text-primary">Status: </span><span class="text-success"><?= $rakitiw_status ?></span>
                                     <?php else: ?>
-                                        <span class="text-primary">Status: </span><span class="text-danger"><?= $variables['modem_rakitan'] ?></span>
+                                        <span class="text-primary">Status: </span><span class="text-danger"><?= $rakitiw_status ?></span>
                                     <?php endif; ?>
                                 </div>
                                 <div class="col-lg-6 col-md-6">
@@ -148,19 +144,19 @@ foreach ($linesnetwork as $linenetwork) {
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
                                         <label for="apn">APN Modem</label>
-                                        <input type="text" class="form-control" placeholder="internet" id="apn" name="apn" value="<?= $variables['apn'] ?>"required <?php if ($variables['modem_rakitan'] == 'Enabled') echo 'disabled'; ?>>
+                                        <input type="text" class="form-control" placeholder="internet" id="apn" name="apn" value="<?= $variables['apn'] ?>"required <?php if ($rakitiw_status == 'Enabled') echo 'disabled'; ?>>
                                     </div>
                                 </div>
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
                                         <label for="host">Host / Bug Untuk Ping | Multi Host</label>
-                                        <input type="text" class="form-control" placeholder="goole.com facebook.com whatsapp.com" id="host" name="host" value="<?= $variables['host'] ?>"required <?php if ($variables['modem_rakitan'] == 'Enabled') echo 'disabled'; ?>>
+                                        <input type="text" class="form-control" placeholder="goole.com facebook.com whatsapp.com" id="host" name="host" value="<?= $variables['host'] ?>"required <?php if ($rakitiw_status == 'Enabled') echo 'disabled'; ?>>
                                     </div>
                                 </div>
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
                                         <label for="interface_modem">Nama Interface Modem</label>
-                                        <select name="interface_modem" id="interface_modem" class="form-control"<?php if ($variables['modem_rakitan'] == 'Enabled') echo 'disabled'; ?>>
+                                        <select name="interface_modem" id="interface_modem" class="form-control"<?php if ($rakitiw_status == 'Enabled') echo 'disabled'; ?>>
                                         <?php
                                         foreach ($interface_modem as $interface) {
                                             echo "<option value=\"$interface\"";
@@ -176,19 +172,19 @@ foreach ($linesnetwork as $linenetwork) {
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
                                         <label for="device_modem">Device Modem Untuk Cek PING</label>
-                                        <input type="text" class="form-control" placeholder="wwan0 Atau Di Kosongkan Default" id="device_modem" name="device_modem" value="<?= $variables['device_modem'] ?>" <?php if ($variables['modem_rakitan'] == 'Enabled') echo 'disabled'; ?>>
+                                        <input type="text" class="form-control" placeholder="wwan0 Atau Di Kosongkan Default" id="device_modem" name="device_modem" value="<?= $variables['device_modem'] ?>" <?php if ($rakitiw_status == 'Enabled') echo 'disabled'; ?>>
                                     </div>
                                 </div>
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
                                         <label for="modem_port">Port Modem AT Command</label>
-                                        <input type="text" class="form-control" placeholder="/dev/ttyUSB0" id="modem_port" name="modem_port" value="<?= $variables['modem_port'] ?>"required <?php if ($variables['modem_rakitan'] == 'Enabled') echo 'disabled'; ?>>
+                                        <input type="text" class="form-control" placeholder="/dev/ttyUSB0" id="modem_port" name="modem_port" value="<?= $variables['modem_port'] ?>"required <?php if ($rakitiw_status == 'Enabled') echo 'disabled'; ?>>
                                     </div>
                                 </div>
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
                                         <label for="delay">Jeda Waktu Detik | Untuk Percobban Berikutnya</label>
-                                        <input type="number" class="form-control" placeholder="10" id="delay" name="delay" value="<?= $variables['delay'] ?>"required <?php if ($variables['modem_rakitan'] == 'Enabled') echo 'disabled'; ?>>
+                                        <input type="number" class="form-control" placeholder="10" id="delay" name="delay" value="<?= $variables['delay'] ?>"required <?php if ($rakitiw_status == 'Enabled') echo 'disabled'; ?>>
                                     </div>
                                 </div>
                                 </div>
@@ -202,8 +198,8 @@ foreach ($linesnetwork as $linenetwork) {
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
                                     <!-- Tambahkan input lainnya di sini -->
-                                    <button type="submit" class="btn btn-primary" name="save"<?php if ($variables['modem_rakitan'] == 'Enabled') echo 'disabled'; ?>>Simpan</button>
-                                    <?php if ($variables['modem_rakitan'] == 'Enabled'): ?>
+                                    <button type="submit" class="btn btn-primary" name="save"<?php if ($rakitiw_status == 'Enabled') echo 'disabled'; ?>>Simpan</button>
+                                    <?php if ($rakitiw_status == 'Enabled'): ?>
                                         <button type="submit" class="btn btn-danger" name="disable">Disable</button>
                                     <?php else: ?>
                                         <?php exec('pid=$(pgrep -f modemngentod.sh) && kill $pid'); ?>
