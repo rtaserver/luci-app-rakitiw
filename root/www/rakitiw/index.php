@@ -200,20 +200,19 @@ foreach ($linesnetwork as $linenetwork) {
                                 </div>
                             </div>
                             <br><div class="card-header"></div><br>
-                            <div class="row">
-                                <div class="col-lg-6 col-md-6">
-                                    <div class="form-group">
-                                    <!-- Tambahkan input lainnya di sini -->
-                                    <button type="submit" class="btn btn-primary" name="save"<?php if ($variables['modem_rakitan'] == 'Enabled') echo 'disabled'; ?>>Simpan</button>
-                                    <?php if ($variables['modem_rakitan'] == 'Enabled'): ?>
-                                        <button type="submit" class="btn btn-danger" name="disable">Disable</button>
-                                    <?php else: ?>
-                                        <?php exec('pid=$(pgrep -f modemngentod.sh) && kill $pid'); ?>
-                                        <button type="submit" class="btn btn-success" name="enable">Enable</button>
-                                    <?php endif; ?>
-                                    </div>
+                            <form action="index.php" method="post">
+                            <td class="d-grid">
+                                <div class="btn-group col" role="group" aria-label="ctrl">
+                                <button type="submit" class="btn btn-primary" name="save"<?php if ($variables['modem_rakitan'] == 'Enabled') echo 'disabled'; ?>>Simpan</button>
+                                <?php if ($variables['modem_rakitan'] == 'Enabled'): ?>
+                                    <button type="submit" class="btn btn-danger" name="disable">Disable</button>
+                                <?php else: ?>
+                                    <?php exec('pid=$(pgrep -f modemngentod.sh) && kill $pid'); ?>
+                                    <button type="submit" class="btn btn-success" name="enable">Enable</button>
+                                <?php endif; ?>
                                 </div>
-                            </div>
+                            </td>
+                            </form>
                         </div>
                     </div>
                 </div>
