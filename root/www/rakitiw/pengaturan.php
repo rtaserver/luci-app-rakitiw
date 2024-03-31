@@ -59,9 +59,9 @@ $startup_status = exec("uci -q get rakitiw.cfg.startup");
                             <td class="d-grid">
                                 <div class="btn-group col" role="group" aria-label="ctrl">
                                 <?php if($startup_status == 1): ?>
-                                    <button type="submit" name="rakitiw" value="enable" class="btn btn-danger">Disable Startup</button>
+                                    <button type="submit" name="rakitiw" value="disable" class="btn btn-danger">Disable Startup</button>
                                 <?php else: ?>
-                                    <button type="submit" name="rakitiw" value="disable" class="btn btn-success">Enable Startup</button>
+                                    <button type="submit" name="rakitiw" value="enable" class="btn btn-success">Enable Startup</button>
                                 <?php endif; ?>
                                 </div>
                             </td>
