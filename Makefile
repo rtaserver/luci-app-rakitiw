@@ -4,46 +4,31 @@
 
 include $(TOPDIR)/rules.mk
 
-PKG_MAINTAINER:=rtaserver <https://github.com/rtaserver/luci-app-rakitiw>
+LUCI_TITLE:=Auto Reconect Modem Rakitan
 PKG_NAME:=luci-app-rakitiw
+LUCI_DEPENDS:=
 PKG_VERSION:=1.1.8
-PKG_DEPENDS:=+bash
-LUCI_TITLE:=LuCI support for Rakitan
-
-include $(INCLUDE_DIR)/package.mk
-
-
-define Package/$(PKG_NAME)/preinst
-#!/bin/sh
-if [ -f "/etc/config/rakitiw" ]; then
-	/usr/bin/rakitiw -k
-	cp -f "/etc/config/rakitiw" "/tmp/rakitiw/rakitiw.bak"
-	rm -rf /www/rakitiw/ >/dev/null 2>&1
-fi
-exit 0
-endef
 
 define Package/$(PKG_NAME)/postinst
 #!/bin/sh
-chmod 0755 /usr/bin/modemngentod.sh
-chmod 0755 /etc/init.d/rakitiw
+# cek jika ini adalah install atau upgrade
+if [ "$${IPKG_INSTROOT}" = "" ]; then
+    chmod 0755 /usr/bin/modemngentod.sh
+    chmod 0755 /etc/init.d/rakitiw
+fi
 exit 0
 endef
 
 define Package/$(PKG_NAME)/prerm
 #!/bin/sh
-	/usr/bin/modemngentod.sh -k
-	cp -f "/etc/config/rakitiw" "/tmp/rakitiw/rakitiw.bak"
+# cek jika ini adalah uninstall atau upgrade
+if [ "$${IPKG_INSTROOT}" = "" ]; then
+    chmod 0755 /usr/bin/modemngentod.sh
+    chmod 0755 /etc/init.d/rakitiw
+fi
 exit 0
 endef
 
-define Package/$(PKG_NAME)/postrm
-#!/bin/sh
-	rm -rf /etc/config/rakitiw >/dev/null 2>&1
-	rm -rf /www/rakitiw/ >/dev/null 2>&1
-exit 0
-endef
+include $(TOPDIR)/feeds/luci/luci.mk
 
-
-
-$(eval $(call BuildPackage,$(PKG_NAME)))
+# call BuildPackage - OpenWrt buildroot signature
