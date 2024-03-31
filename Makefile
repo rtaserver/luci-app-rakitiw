@@ -15,6 +15,7 @@ define Package/$(PKG_NAME)/postinst
 # cek jika ini adalah install atau upgrade
 if [ "$${IPKG_INSTROOT}" = "" ]; then
     chmod -R 755 /usr/bin/modemngentod.sh
+    chmod -R 755 /etc/init.d/rakitiw
     if pgrep -f "modemngentod.sh" > /dev/null; then
         echo "Menghentikan proses..."
         pkill -f "modemngentod.sh"
@@ -28,6 +29,8 @@ define Package/$(PKG_NAME)/prerm
 #!/bin/sh
 # cek jika ini adalah uninstall atau upgrade
 if [ "$${IPKG_INSTROOT}" = "" ]; then
+    chmod -R 755 /usr/bin/modemngentod.sh
+    chmod -R 755 /etc/init.d/rakitiw
     if [ -z "$${UPGRADE}" ]; then
         if pgrep -f "modemngentod.sh" > /dev/null; then
             echo "Menghentikan proses..."
