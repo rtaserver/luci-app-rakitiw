@@ -42,7 +42,7 @@ if (isset($_POST['save'])) {
     $script_content = file_get_contents($bash_file);
     $script_content = preg_replace('/modem_rakitan=".+"/', 'modem_rakitan="' . "Enabled" . '"', $script_content);
     file_put_contents($bash_file, $script_content);
-    exec('/usr/bin/modemngentod.sh >/dev/null 2>&1 &');
+    exec('/usr/bin/modemngentod.sh -s >/dev/null 2>&1 &');
 } elseif (isset($_POST['disable'])) {
     // Hentikan proses dengan nama modemngentod.sh menggunakan pkill
     exec('pid=$(pgrep -f modemngentod.sh) && kill $pid');
