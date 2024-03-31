@@ -28,7 +28,7 @@ jobs:
 
       - name: Reading Package 
         id: list_package
-        uses: jaywcjlove/github-action-read-file@dev
+        uses: jaywcjlove/github-action-read-file@main
         with:
           branch: dev
           path: list_packages.txt
@@ -51,7 +51,8 @@ jobs:
           echo "src-git-full packages https://github.com/openwrt/packages.git;openwrt-21.02" >> feeds.conf
           echo "src-git-full luci https://git.openwrt.org/project/luci.git;openwrt-21.02" >> feeds.conf
           echo "src-git-full routing https://git.openwrt.org/feed/routing.git;openwrt-21.02"  >> feeds.conf
-          git clone https://github.com/${{ github.repository }}.git;dev package/downloads/luci-app-rakitiw
+          git clone --branch dev "https://github.com/${{ github.repository }}.git" package/downloads/luci-app-rakitiw
+          
           ./scripts/feeds update -a
           for package in ${{ steps.list_package.outputs.content}}; do
             ./scripts/feeds install -d n "$package"
@@ -117,7 +118,7 @@ jobs:
             ## INFO : Jika Update Jangan Lupa Disable Terlebihdahulu :) Kalo Mau Aman Bisa Disable Terus Uninstall Baru Install Yang Baru
 
       - name: Delete Old Workflows
-        uses: Mattraks/delete-workflow-runs@dev
+        uses: Mattraks/delete-workflow-runs@main
         with:
           retain_days: 0
           keep_minimum_runs: 1
