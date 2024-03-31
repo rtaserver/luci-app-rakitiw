@@ -76,7 +76,7 @@ jobs:
         run: |
           cd sdk
           for package in ${{ steps.list_package.outputs.content}}; do
-            make -j1 V=s "package/$package/compile"
+            make "package/$package/compile"
           done
           mv bin/packages/x86_64/base/ ../
           cd ..
