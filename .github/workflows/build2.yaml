@@ -1,87 +1,129 @@
-#
-# Copyright (C) 2024 nosignals
-#
-name: Building Rakitiw For Dev
+name: Build New IPK Dev
 
 on:
+  push:
+    branches:
+      - dev
+  repository_dispatch:
   workflow_dispatch:
     inputs:
       prerelease:
-        description: 'Prerelease ?'
+        description: 'Pre Release'
         required: true
-        default: false
+        default: true
         type: boolean
-        
-jobs: 
-  build_ipk:
-    permissions:
-      contents: write
-    name: Build Rakitiw
+
+env:
+  TZ: Asia/Jakarta
+  GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+jobs:
+  job_build_rta:
+    name: Build RTA (dev)
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        release:
-          - 21.02.7
-          - 23.05.0
-        arch:
-          - x86_64
-          
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v2
         with:
+          fetch-depth: 0
           ref: dev
 
       - name: Get PKG_VERSION from Makefile
         id: vars
         run: echo "::set-output name=version::$(grep 'PKG_VERSION:=' Makefile | cut -d '=' -f2)"
 
-      - name: Preparing Rakitiw
-        run: |
-              echo ""
-              mkdir feeds artifacts
-        
-      - name: Building Luci Rakitiw
-        uses: nosignals/gh-action-sdk@main
-        env:
-          ARCH: ${{ matrix.arch }}-${{ matrix.release }}
-          ARTIFACTS_DIR: ${{ github.workspace }}/artifacts
-          FEED_DIR: ${{ github.workspace }}
-          PACKAGES: luci-app-rakitiw
-          NO_SHFMT_CHECK: 1
-        
-      - name: Delivering Package
-        uses: actions/upload-artifact@v3
+      - name: Reading Package 
+        id: list_package
+        uses: jaywcjlove/github-action-read-file@main
         with:
-          name: luci-app-rakitiw-${{ matrix.release }}_${{ matrix.arch }}
-          path: ${{ github.workspace }}/artifacts/bin/packages/${{ matrix.arch }}/action/luci-app-rakitiw*
+          branch: main
+          path: list_packages.txt
 
-  push_packages:
-    needs: build_ipk
-    name: Push Packages to Release
-    permissions:
-      contents: write  # To push a branch
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download temporary artifact
-        uses: actions/download-artifact@v3
-        
-      - name: Moving artifact to releases
+      - name: Install packages
+        run: |
+          echo "Install packages"
+          sudo apt-get update
+          sudo apt-get install -y build-essential libncurses-dev git-core subversion gettext unzip zlib1g-dev file perl libssl-dev wget
+
+      - name: Initialization environment
+        env:
+          url_sdk: https://archive.openwrt.org/releases/21.02.5/targets/x86/64/openwrt-sdk-21.02.5-x86-64_gcc-8.4.0_musl.Linux-x86_64.tar.xz
+        run: |
+          wget ${{ env.url_sdk }}
+          file_name=$(echo ${{env.url_sdk}} | awk -F/ '{print $NF}')
+          mkdir sdk && tar -xJf $file_name -C ./sdk --strip-components=1
+          cd sdk  
+          echo "src-git base https://github.com/openwrt/openwrt.git;openwrt-21.02" > feeds.conf
+          echo "src-git-full packages https://github.com/openwrt/packages.git;openwrt-21.02" >> feeds.conf
+          echo "src-git-full luci https://git.openwrt.org/project/luci.git;openwrt-21.02" >> feeds.conf
+          echo "src-git-full routing https://git.openwrt.org/feed/routing.git;openwrt-21.02"  >> feeds.conf
+          git clone https://github.com/${{ github.repository }}.git package/downloads/luci-app-rakitiw
+          ./scripts/feeds update -a
+          for package in ${{ steps.list_package.outputs.content}}; do
+            ./scripts/feeds install -d n "$package"
+          done
+
+      - name: Configure RTA (main)
+        run: |
+          cd sdk
+          for package in ${{ steps.list_package.outputs.content}}; do
+            ./scripts/feeds install "$package"
+          done
+          make defconfig
+
+      - name: Compile RTA (main)
+        id: compile
+        run: |
+          cd sdk
+          for package in ${{ steps.list_package.outputs.content}}; do
+            make "package/$package/compile"
+          done
+          mv bin/packages/x86_64/base/ ../
+          cd ..
+          echo "status=success" >> $GITHUB_OUTPUT
+          echo "FIRMWARE=$PWD" >> $GITHUB_ENV
+          echo "DATETIME=$(date +'%Y.%m.%d-%H:%M:%S')" >> $GITHUB_ENV
+
+      - name: Add changelog info to new release description
+        id: changelog
         shell: bash
         run: |
-          mkdir ./release
-          cp -rf ./luci-app-rakitiw-21.02.7_x86_64/* ./release/luci-app-rakitiw_${{ steps.vars.outputs.version }}_all_21_02.ipk
-          cp -rf ./luci-app-rakitiw-23.05.0_x86_64/* ./release/luci-app-rakitiw_${{ steps.vars.outputs.version }}_all_23_05.ipk
-  
-      - name: Upload release asset
+          r=$(awk '/^\*\*Changelog\*\*/ {if(found) exit; found=1} found' CHANGELOG.md)
+          r="${r//'%'/'%25'}"
+          r="${r//$'\n'/'%0A'}"
+          r="${r//$'\r'/'%0D'}"  
+          echo "CHANGELOG=$r" >> $GITHUB_OUTPUT
+
+      - name: Upload Firmware to Release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./release/*
-          overwrite: true
-          prerelease: ${{ inputs.prerelease }}
-          tag: "pre-release"
           file_glob: true
+          file: ${{ env.FIRMWARE }}/base/*.ipk
+          asset_name: ${{ github.event.repository.name }}-${{ github.sha }}
+          tag: "${{ steps.vars.outputs.version }}"
+          release_name: "Luci App Rakitiw Version - ${{ github.event.repository.name }} - ${{ env.DATETIME }}"
+          prerelease: ${{ inputs.prerelease }}
+          overwrite: true
           body: |
-            # LUCI APP RAKITIW ${{ steps.vars.outputs.version }}
+            Build date: ${{ env.DATETIME }} For Version : ${{ github.event.repository.name }}
+        
+            ${{ steps.changelog.outputs.CHANGELOG }}
+
+            Tutor Install Dan Upgrade
+            ---
+            ### Install : 
+              1. Download File luci-app-rakitiw_${{ steps.vars.outputs.version }}_all.ipk
+              2. Login OpenWrt -> Masuk Ke Tab System -> Software
+              3. Klik Update List Tunggu Hingga Selesai Update
+              4. Klik Upload Package -> Browse -> Pilih .ipk Yang Sudah Di Download Tadi -> Kilik Upload -> Klik Install
+              5. Setelah Selesai Silahkan Cek Pada Bagian Tab Modem
+              6. Jika Tidak Muncul Bisa Akses Manual Di : http://192.168.1.1/rakitiw - sesuaikan dengan IP OpenWrt Masing-Masing
+
+            ## INFO : Jika Update Jangan Lupa Disable Terlebihdahulu :) Kalo Mau Aman Bisa Disable Terus Uninstall Baru Install Yang Baru
+
+      - name: Delete Old Workflows
+        uses: Mattraks/delete-workflow-runs@main
+        with:
+          retain_days: 0
+          keep_minimum_runs: 1
