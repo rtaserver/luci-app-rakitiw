@@ -28,7 +28,7 @@ jobs:
 
       - name: Reading Package 
         id: list_package
-        uses: jaywcjlove/github-action-read-file@dev
+        uses: jaywcjlove/github-action-read-file@main
         with:
           branch: dev
           path: list_packages.txt
@@ -117,7 +117,7 @@ jobs:
             ## INFO : Jika Update Jangan Lupa Disable Terlebihdahulu :) Kalo Mau Aman Bisa Disable Terus Uninstall Baru Install Yang Baru
 
       - name: Delete Old Workflows
-        uses: Mattraks/delete-workflow-runs@dev
+        uses: Mattraks/delete-workflow-runs@main
         with:
           retain_days: 0
           keep_minimum_runs: 1
