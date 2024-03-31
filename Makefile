@@ -14,13 +14,6 @@ PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
 
 include $(INCLUDE_DIR)/package.mk
 
-define Build/Prepare
-#!/bin/sh
-	chmod 0755 $(PKG_BUILD_DIR)/root/etc/init.d/rakitiw
-	chmod 0755 $(PKG_BUILD_DIR)/root/usr/bin/modemngentod.sh
-	chmod 0755 $(PKG_BUILD_DIR)/root/etc/uci-defaults/99_rakitiw
-exit 0
-endef
 
 define Package/$(PKG_NAME)/preinst
 #!/bin/sh
@@ -54,10 +47,6 @@ define Package/$(PKG_NAME)/postrm
 	exit 0
 endef
 
-define Package/$(PKG_NAME)/install
-#!/bin/sh
 
-exit 0
-endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
