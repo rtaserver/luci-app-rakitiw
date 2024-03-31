@@ -21,7 +21,7 @@ if [ "$${IPKG_INSTROOT}" = "" ]; then
         rm /var/run/modemngentod.pid
         pid=$(pgrep -f modemngentod.sh) && kill $pid
     else
-        log "Rakitiw is not running."
+        echo "Rakitiw is not running."
     fi
 fi
 exit 0
@@ -39,7 +39,7 @@ if [ "$${IPKG_INSTROOT}" = "" ]; then
         rm /var/run/modemngentod.pid
         pid=$(pgrep -f modemngentod.sh) && kill $pid
     else
-        log "Rakitiw is not running."
+        echo "Rakitiw is not running."
     fi
 fi
 exit 0
