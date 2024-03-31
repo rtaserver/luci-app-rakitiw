@@ -1,128 +1,278 @@
-name: Build New IPK Dev
-
+name: "Compile Dev"
 on:
-  push:
-    branches:
-      - dev
   repository_dispatch:
   workflow_dispatch:
     inputs:
-      prerelease:
-        description: 'Pre Release'
-        required: true
-        default: true
-        type: boolean
-
+      ssh:
+        description: 'SSH connection to Actions'
+        required: false
+        default: 'false'
+ # push:
+ #   branches:
+ #     - 'dev'
 env:
   TZ: Asia/Jakarta
-  GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+  rakitiw: ${{ github.repository }}
 
 jobs:
-  job_build_rta:
-    name: Build RTA (dev)
+  job_check:
+    name: Check Version
     runs-on: ubuntu-latest
+    outputs:
+      rakitiw_version: ${{ steps.check_version.outputs.latest_version }}
+      has_update: ${{ steps.check_version.outputs.has_update }}
     steps:
+      - name: Delete Pre-Release
+        uses: dev-drprasad/delete-tag-and-release@v1.0 # PRERELEASE is v1.0 and can also be used to test and give us feedback
+        with:
+          tag_name: pre-release #(required) tag name to delete 
+          github_token: ${{ secrets.GITHUB_TOKEN }} # (required) a GitHub token with write access to the repo that needs to be modified
+          delete_release: true #(optional) default: true 
+
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@main
         with:
           fetch-depth: 0
+          ref: 'dev'
 
-      - name: Get PKG_VERSION from Makefile
-        id: vars
-        run: echo "::set-output name=version::$(grep 'PKG_VERSION:=' Makefile | cut -d '=' -f2)"
+      - name: Check version
+        id: check_version
+        env:
+          url_release: https://api.github.com/repos/${{ env.rakitiw }}/releases/latest
+        run: |
+          latest_version=$(awk -F ':=' '/PKG_VERSION|PKG_RELEASE/ {print $2}' Makefile | sed ':a;N;s/\n$//;s/\n/-/;ba')
+          latest_release=$(wget -qO- -t1 -T2 ${{env.url_release}} | awk -F '"' '/tag_name/{print $4}')
+          has_update=$([ "${latest_version}" != "${latest_release}" ] && echo true || echo false)
+          echo "latest_version=${latest_version}" >> $GITHUB_OUTPUT
+          echo "has_update=${has_update}" >> $GITHUB_OUTPUT
+          echo "latest_version: ${latest_version}"
+          echo "latest_release: ${latest_release}"
+          echo "has_update: ${has_update}"
 
-      - name: Reading Package 
-        id: list_package
-        uses: jaywcjlove/github-action-read-file@main
+      - name: Prepare release
+        run: |
+          echo "## :mega:Update content" >> release.txt
+          echo "![](https://img.shields.io/github/downloads/${{ env.rakitiw }}/${{steps.check_version.outputs.latest_version}}/total?style=flat-square)" >> release.txt
+          echo "### RAKITIW Info" >> release.txt
+          echo "**:minidisc: RAKITIW Version: ${{steps.check_version.outputs.latest_version}}**" >> release.txt
+          touch release.txt
+
+      - name: Generate new tag & release
+        uses: softprops/action-gh-release@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          branch: main
-          path: list_packages.txt
+          tag_name: pre-release
+          prerelease: true
+          body_path: release.txt
 
+
+  job_build_rakitiw:
+    name: Build rakitiw [Luci ${{ matrix.luci_ver }}]
+    needs: job_check
+    if: needs.job_check.outputs.has_update == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - sdk_ver: 21.02
+            luci_ver: 19.07
+            sdk_url: https://downloads.openwrt.org/releases/21.02.5/targets/x86/64/openwrt-sdk-21.02.5-x86-64_gcc-8.4.0_musl.Linux-x86_64.tar.xz
+
+          - sdk_ver: 23.05
+            luci_ver: 23.05
+            sdk_url: https://downloads.openwrt.org/releases/23.05.0/targets/x86/64/openwrt-sdk-23.05.0-x86-64_gcc-12.3.0_musl.Linux-x86_64.tar.xz
+
+    steps:
       - name: Install packages
         run: |
+          docker rmi `docker images -q`
+          sudo -E rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d /usr/local/lib/android
+          df -hT
           echo "Install packages"
-          sudo apt-get update
-          sudo apt-get install -y build-essential libncurses-dev git-core subversion gettext unzip zlib1g-dev file perl libssl-dev wget
+          sudo -E apt-get -qq update
+          sudo -E apt-get -qq install build-essential clang flex bison g++ gawk gcc-multilib g++-multilib gettext git libncurses5-dev libssl-dev python3-distutils rsync unzip zlib1g-dev file wget
+          sudo -E apt-get -qq autoremove --purge
+          sudo -E apt-get -qq clean
+
+      - name: Cache openwrt SDK
+        id: cache-sdk
+        uses: actions/cache@v4
+        with:
+          path: sdk
+          key: openwrt-sdk-23.05-rc3-x86_64
 
       - name: Initialization environment
+        if: steps.cache-sdk.outputs.cache-hit != 'true'
         env:
-          url_sdk: https://archive.openwrt.org/releases/21.02.5/targets/x86/64/openwrt-sdk-21.02.5-x86-64_gcc-8.4.0_musl.Linux-x86_64.tar.xz
+          url_sdk: https://downloads.openwrt.org/releases/23.05.0/targets/x86/64/openwrt-sdk-23.05.0-x86-64_gcc-12.3.0_musl.Linux-x86_64.tar.xz
         run: |
           wget ${{ env.url_sdk }}
           file_name=$(echo ${{env.url_sdk}} | awk -F/ '{print $NF}')
           mkdir sdk && tar -xJf $file_name -C ./sdk --strip-components=1
-          cd sdk  
-          echo "src-git base https://github.com/openwrt/openwrt.git;openwrt-21.02" > feeds.conf
-          echo "src-git-full packages https://github.com/openwrt/packages.git;openwrt-21.02" >> feeds.conf
-          echo "src-git-full luci https://git.openwrt.org/project/luci.git;openwrt-21.02" >> feeds.conf
-          echo "src-git-full routing https://git.openwrt.org/feed/routing.git;openwrt-21.02"  >> feeds.conf
-          git clone https://github.com/${{ github.repository }}.git package/downloads/luci-app-rakitiw
+          cd sdk
+          echo "src-git base https://github.com/openwrt/openwrt.git;openwrt-${{ matrix.sdk_ver }}" > feeds.conf
+          echo "src-git packages https://github.com/openwrt/packages.git;openwrt-${{ matrix.sdk_ver }}" >> feeds.conf
+          echo "src-git luci https://github.com/openwrt/luci.git;openwrt-${{ matrix.luci_ver }}" >> feeds.conf
+          echo "src-git routing https://git.openwrt.org/feed/routing.git;openwrt-${{ matrix.sdk_ver }}"  >> feeds.conf
+          echo "src-git rakitiw https://github.com/${{ env.rakitiw }}.git;dev" >> feeds.conf
           ./scripts/feeds update -a
-          for package in ${{ steps.list_package.outputs.content}}; do
-            ./scripts/feeds install -d n "$package"
-          done
+          echo "CONFIG_PACKAGE_luci-app-rakitiw=m" > .config
+          ./scripts/feeds install -d n luci-app-rakitiw
+          make download -j8
 
-      - name: Configure RTA (main)
+      - name: Configure rakitiw
         run: |
           cd sdk
-          for package in ${{ steps.list_package.outputs.content}}; do
-            ./scripts/feeds install "$package"
-          done
+          ./scripts/feeds update rakitiw
+          ./scripts/feeds install luci-app-rakitiw
+          echo "CONFIG_ALL_NONSHARED=n" > .config
+          echo "CONFIG_ALL_KMODS=n" >> .config
+          echo "CONFIG_ALL=n" >> .config
+          echo "CONFIG_AUTOREMOVE=n" >> .config
+          echo "CONFIG_LUCI_LANG_zh_Hans=n" >> .config
+
+          echo "CONFIG_PACKAGE_luci-app-rakitiw=m" >> .config
+
           make defconfig
 
-      - name: Compile RTA (main)
+      - name: Compile rakitiw
         id: compile
         run: |
           cd sdk
-          for package in ${{ steps.list_package.outputs.content}}; do
-            make "package/$package/compile"
-          done
-          mv bin/packages/x86_64/base/ ../
+          echo "make package/luci-app-rakitiw/{clean,compile} -j$(nproc)"
+          make package/luci-app-rakitiw/{clean,compile} -j$(nproc)
+          mv bin/packages/x86_64/rakitiw/ ../
+          rm .config .config.old
+          cd ../rakitiw
+          for i in $(ls); do mv $i luci-${{ matrix.luci_ver }}_$i; done
           cd ..
           echo "status=success" >> $GITHUB_OUTPUT
           echo "FIRMWARE=$PWD" >> $GITHUB_ENV
-          echo "DATETIME=$(date +'%Y.%m.%d-%H:%M:%S')" >> $GITHUB_ENV
 
-      - name: Add changelog info to new release description
-        id: changelog
-        shell: bash
+      - name: Upload rakitiw ipks to release
+        uses: softprops/action-gh-release@master
+        if: steps.compile.outputs.status == 'success'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: pre-release
+          prerelease: true
+          files: ${{ env.FIRMWARE }}/rakitiw/*.ipk
+
+
+  job_auto_compile:
+    if: needs.job_check.outputs.has_update == 'true'
+    needs: job_check
+    runs-on: ubuntu-latest
+    name: build (${{ matrix.platform }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: x86_64
+            url_sdk: https://downloads.openwrt.org/releases/23.05.0/targets/x86/64/openwrt-sdk-23.05.0-x86-64_gcc-12.3.0_musl.Linux-x86_64.tar.xz
+
+    steps:
+      - name: Initialization ${{ matrix.platform }} compile environment
         run: |
-          r=$(awk '/^\*\*Changelog\*\*/ {if(found) exit; found=1} found' CHANGELOG.md)
-          r="${r//'%'/'%25'}"
-          r="${r//$'\n'/'%0A'}"
-          r="${r//$'\r'/'%0D'}"  
-          echo "CHANGELOG=$r" >> $GITHUB_OUTPUT
+          docker rmi `docker images -q`
+          sudo -E rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d /usr/local/lib/android
+          df -hT
+          echo "install packages!!!!!!"
+          sudo -E apt-get -qq update
+          sudo -E apt-get -qq install $(curl -fsSL https://github.com/smallprogram/OpenWrtAction/raw/main/diy_script/official_dependence)
+          sudo -E apt-get -qq autoremove --purge
+          sudo -E apt-get -qq clean
 
-      - name: Upload Firmware to Release
-        uses: svenstaro/upload-release-action@v2
+      - name: ${{ matrix.platform }} sdk download
+        run: |
+          wget ${{ matrix.url_sdk }}
+          file_name=$(echo ${{matrix.url_sdk}} | awk -F/ '{print $NF}')
+          mkdir sdk && tar -xJf $file_name -C ./sdk --strip-components=1
+          cd sdk
+
+      - name: SSH connection to Actions
+        uses: mxschmitt/action-tmate@v3.13
+        if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
+
+      - name: ${{ matrix.platform }} feeds configuration packages
+        run: |
+          cd sdk
+          echo "src-git base https://github.com/openwrt/openwrt.git;openwrt-23.05" > feeds.conf
+          echo "src-git packages https://github.com/openwrt/packages.git;openwrt-23.05" >> feeds.conf
+          echo "src-git luci https://github.com/openwrt/luci.git;openwrt-23.05" >> feeds.conf
+          echo "src-git routing https://git.openwrt.org/feed/routing.git;openwrt-23.05"  >> feeds.conf
+          echo "src-git passwall_packages https://github.com/${{ env.packages}}.git;main" >> feeds.conf
+          echo "src-git rakitiw https://github.com/${{ env.rakitiw }}.git;dev" >> feeds.conf
+
+          ./scripts/feeds update -a
+          ./scripts/feeds install luci-app-rakitiw
+
+          rm -rf feeds/packages/lang/golang
+          git clone https://github.com/sbwml/packages_lang_golang -b 22.x feeds/packages/lang/golang
+
+          
+
+          echo "CONFIG_ALL_NONSHARED=n" > .config
+          echo "CONFIG_ALL_KMODS=n" >> .config
+          echo "CONFIG_ALL=n" >> .config
+          echo "CONFIG_AUTOREMOVE=n" >> .config
+
+          make defconfig
+
+
+      - name: ${{ matrix.platform }} download
+        run: |
+          cd sdk
+          make download -j8
+          find dl -size -1024c -exec ls -l {} \;
+
+      - name: ${{ matrix.platform }} compile
+        id: compile
+        run: |
+          cd sdk
+          for package in $(ls feeds/passwall_packages); do
+              if [ -d "feeds/passwall_packages/$package" ]; then
+                  make package/feeds/passwall_packages/$package/compile -j$(nproc) 2>/dev/null
+              fi
+          done
+
+          echo "status=success" >> $GITHUB_OUTPUT
+
+      - name: Organize ${{ matrix.platform }} files
+        id: organize
+        if: steps.compile.outputs.status == 'success'
+        run: |
+          cd sdk
+          mkdir upload
+
+          zip -jr upload/rakitiw_packages_ipk_${{ matrix.platform }}.zip bin/packages/*/passwall_packages/
+
+          echo "FIRMWARE=$PWD" >> $GITHUB_ENV
+          echo "status=success" >> $GITHUB_OUTPUT
+
+      - name: Generate release info
+        id: info
+        if: steps.compile.outputs.status == 'success'
+        run: |
+          cd sdk
+          echo "## :mega:Update content" >> release.txt
+          echo "![](https://img.shields.io/github/downloads/${{ env.rakitiw }}/${{needs.job_check.outputs.rakitiw_version}}/total?style=flat-square)" >> release.txt
+          echo "### RAKITIW Info" >> release.txt
+          echo "**:minidisc: RAKITIW Version: ${{needs.job_check.outputs.rakitiw_version}}**" >> release.txt
+
+          touch release.txt
+          echo "status=success" >> $GITHUB_OUTPUT
+
+      - name: Upload firmware to release
+        uses: softprops/action-gh-release@master
+        if: steps.info.outputs.status == 'success'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file_glob: true
-          file: ${{ env.FIRMWARE }}/base/*.ipk
-          asset_name: ${{ github.event.repository.name }}-${{ github.sha }}
-          tag: "${{ steps.vars.outputs.version }}"
-          release_name: "Luci App Rakitiw Version - ${{ github.event.repository.name }} - ${{ env.DATETIME }}"
-          prerelease: ${{ inputs.prerelease }}
-          overwrite: true
-          body: |
-            Build date: ${{ env.DATETIME }} For Version : ${{ github.event.repository.name }}
-        
-            ${{ steps.changelog.outputs.CHANGELOG }}
-
-            Tutor Install Dan Upgrade
-            ---
-            ### Install : 
-              1. Download File luci-app-rakitiw_${{ steps.vars.outputs.version }}_all.ipk
-              2. Login OpenWrt -> Masuk Ke Tab System -> Software
-              3. Klik Update List Tunggu Hingga Selesai Update
-              4. Klik Upload Package -> Browse -> Pilih .ipk Yang Sudah Di Download Tadi -> Kilik Upload -> Klik Install
-              5. Setelah Selesai Silahkan Cek Pada Bagian Tab Modem
-              6. Jika Tidak Muncul Bisa Akses Manual Di : http://192.168.1.1/rakitiw - sesuaikan dengan IP OpenWrt Masing-Masing
-
-            ## INFO : Jika Update Jangan Lupa Disable Terlebihdahulu :) Kalo Mau Aman Bisa Disable Terus Uninstall Baru Install Yang Baru
-
-      - name: Delete Old Workflows
-        uses: Mattraks/delete-workflow-runs@main
-        with:
-          retain_days: 0
-          keep_minimum_runs: 1
+          tag_name: ${{needs.job_check.outputs.rakitiw_version}}
+          body_path: ${{ env.FIRMWARE }}/release.txt
+          files: ${{ env.FIRMWARE }}/upload/*
+          prerelease: true
