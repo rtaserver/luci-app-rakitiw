@@ -68,8 +68,8 @@
 <?php include("javascript.php"); ?>
 <script>
     $(document).ready(function(){
-        var startup_status=exec("uci -q get rakitiw.cfg.startup");
-        if(startup_status === '1') {
+        var startup_status = localStorage.getItem('checkboxChecked');
+        if(startup_status === 'true') {
             $('#checkok').prop('checked', true);
         }
 
@@ -80,11 +80,13 @@
                 localStorage.setItem('checkboxChecked', 'true');
                 $.post('api.php', {startup: 1}, function(response){
                     console.log(response);
+                     alert('Status startup berhasil disimpan!');
                 });
             } else {
                 localStorage.setItem('checkboxChecked', 'false');
                 $.post('api.php', {startup: 0}, function(response){
                     console.log(response);
+                     alert('Status startup berhasil disimpan!');
                 });
             }
         });
@@ -92,4 +94,3 @@
 </script>
 </body>
 </html>
-

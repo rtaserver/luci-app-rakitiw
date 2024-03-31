@@ -1,2 +1,3 @@
 config rakitiw 'cfg'
+	option status 'Disabled'
 	option startup '0'

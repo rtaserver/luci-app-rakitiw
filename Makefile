@@ -34,7 +34,6 @@ if [ "$${IPKG_INSTROOT}" = "" ]; then
             pkill -f "modemngentod.sh"
             echo "Proses telah dihentikan."
         fi
-        crontab -l | grep -v '/usr/bin/modemngentod.sh' | crontab -
     fi
 fi
 exit 0
