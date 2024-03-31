@@ -7,18 +7,8 @@ include $(TOPDIR)/rules.mk
 PKG_MAINTAINER:=rtaserver <https://github.com/rtaserver/luci-app-rakitiw>
 PKG_NAME:=luci-app-rakitiw
 PKG_VERSION:=1.1.8
-
-define Package/$(PKG_NAME)
-	CATEGORY:=LuCI
-	SUBMENU:=3. Applications
-	TITLE:=LuCI support for rakitan
-	PKGARCH:=all
-	DEPENDS:=
-endef
-
-define Package/$(PKG_NAME)/description
-    A LuCI support for rakitan
-endef
+PKG_DEPENDS:=
+LUCI_TITLE:=LuCI support for Rakitan
 
 define Package/$(PKG_NAME)/postinst
 #!/bin/sh
