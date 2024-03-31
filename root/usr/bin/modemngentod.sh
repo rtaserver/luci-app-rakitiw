@@ -99,17 +99,13 @@ fi
 rakitiw_stop() {
     # Hentikan skrip jika sedang berjalan
     if [ -f /var/run/modemngentod.pid ]; then
+        modem_rakitan="Disabled"
         kill $(cat /var/run/modemngentod.pid)
         rm /var/run/modemngentod.pid
+        pid=$(pgrep -f modemngentod.sh) && kill $pid
     else
         log "Rakitiw is not running."
     fi
-}
-
-rakitiw_restart() {
-    rakitiw_stop
-    sleep 2
-    rakitiw_start
 }
 
 while getopts ":skrpcvh" rakitiw ; do
@@ -123,9 +119,6 @@ while getopts ":skrpcvh" rakitiw ; do
             ;;
         k)
             rakitiw_stop
-            ;;
-        r)
-            rakitiw_restart
             ;;
     esac
 done

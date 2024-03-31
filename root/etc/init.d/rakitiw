@@ -11,10 +11,6 @@ start() {
     fi
 }
 
-restart() {
-    $BIN -r
-}
-
 stop_service() {
     $BIN -k
 }

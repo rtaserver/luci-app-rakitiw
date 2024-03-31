@@ -1,9 +1,19 @@
-<!doctype html>
+<?php
+if(isset($_POST['rakitiw'])){
+    $dt = $_POST['rakitiw'];
+    if ($dt == 'enable') shell_exec("uci set rakitiw.cfg.startup='1' && uci commit rakitiw");
+    if ($dt == 'disable') shell_exec("uci set rakitiw.cfg.startup='0' && uci commit rakitiw");
+}
+
+
+?>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <?php
-        $title = "Home";
-        include("head.php");
+    $title = "Home";
+    include("head.php");
     ?>
     <script src="lib/vendor/jquery/jquery-3.6.0.slim.min.js"></script>
     <style>
@@ -44,17 +54,14 @@
                                 <br>  
                             </div>    
                             <div class="container-fluid">
-                                <div class="form-group">
-                                    <div class="center-align">
-                                        <input type="checkbox" id="checkok" name="checkok">
-                                        <label for="checkok">Aktifkan Startup</label>
-                                    </div>
+                            <form action="index.php" method="post">
+                            <td class="d-grid">
+                                <div class="btn-group col" role="group" aria-label="ctrl">
+                                    <button type="submit" name="rakitiw" value="enable" class="btn btn<?php if($startup_status==1) echo "-outline" ?>-success <?php if($startup_status==1) echo "disabled" ?> d-grid">Enable Startup</button>
+                                    <button type="submit" name="rakitiw" value="disable" class="btn btn<?php if($startup_status==0) echo "-outline" ?>-danger <?php if($startup_status==0) echo "disabled" ?> d-grid">Disable Startup</button>
                                 </div>
-                                <div class="form-group">
-                                    <div class="center-align">
-                                        <button type="button" id="submitBtn" class="btn btn-primary">Simpan</button>
-                                    </div>
-                                </div>
+                            </td>
+                            </form>
                             </div>
                         </div>
                     </div>
@@ -66,29 +73,5 @@
     </form>
 </div>
 <?php include("javascript.php"); ?>
-<script>
-    $(document).ready(function(){
-        var startup_status =exec("uci -q get rakitiw.cfg.startup");
-        if(startup_status === '1') {
-            $('#checkok').prop('checked', true);
-        }
-
-        // Menangani klik tombol Simpan
-        $('#submitBtn').click(function(){
-            var startup_status = $('#checkok').is(':checked');
-            if(startup_status) {
-                $.post('api.php', {startup: 1}, function(response){
-                    console.log(response);
-                     alert('Status startup berhasil disimpan!');
-                });
-            } else {
-                $.post('api.php', {startup: 0}, function(response){
-                    console.log(response);
-                     alert('Status startup berhasil disimpan!');
-                });
-            }
-        });
-    });
-</script>
 </body>
 </html>
