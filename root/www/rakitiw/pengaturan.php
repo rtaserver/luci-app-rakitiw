@@ -1,9 +1,24 @@
-<!doctype html>
+<?php
+// Proses kueri POST jika ada
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if(isset($_POST['startup_status'])) {
+        $startup_status = $_POST['startup_status'];
+        exec("uci set rakitiw.cfg.startup=$startup_status");
+        exec("uci commit rakitiw");
+        exit; // Keluar dari skrip setelah menangani permintaan POST
+    }
+}
+
+// Mendapatkan status startup saat halaman dimuat
+$startup_status = exec("uci -q get rakitiw.cfg.startup");
+?>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <?php
-        $title = "Home";
-        include("head.php");
+    $title = "Home";
+    include("head.php");
     ?>
     <script src="lib/vendor/jquery/jquery-3.6.0.slim.min.js"></script>
     <style>
@@ -46,7 +61,7 @@
                             <div class="container-fluid">
                                 <div class="form-group">
                                     <div class="center-align">
-                                        <input type="checkbox" id="checkok" name="checkok">
+                                        <input type="checkbox" id="checkok" name="checkok" <?php if($startup_status == '1') echo 'checked'; ?>>
                                         <label for="checkok">Aktifkan Startup</label>
                                     </div>
                                 </div>
@@ -68,25 +83,12 @@
 <?php include("javascript.php"); ?>
 <script>
     $(document).ready(function(){
-        var startup_status =exec("uci -q get rakitiw.cfg.startup");
-        if(startup_status === '1') {
-            $('#checkok').prop('checked', true);
-        }
-
         // Menangani klik tombol Simpan
         $('#submitBtn').click(function(){
-            var startup_status = $('#checkok').is(':checked');
-            if(startup_status) {
-                $.post('api.php', {startup: 1}, function(response){
-                    console.log(response);
-                     alert('Status startup berhasil disimpan!');
-                });
-            } else {
-                $.post('api.php', {startup: 0}, function(response){
-                    console.log(response);
-                     alert('Status startup berhasil disimpan!');
-                });
-            }
+            var startup_status = $('#checkok').prop('checked') ? '1' : '0';
+            $.post("<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>", { startup_status: startup_status }, function(data) {
+                alert('Status startup berhasil disimpan!');
+            });
         });
     });
 </script>
