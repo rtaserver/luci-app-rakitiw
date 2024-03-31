@@ -8,6 +8,7 @@ log() {
 }
 
 # Variabel
+modem_rakitan="Disabled"
 #===============================
 apn="internet"
 host="google.com 1.1.1.1 facebook.com whatsapp.com"
@@ -101,7 +102,7 @@ rakitiw_stop() {
         kill $(cat /var/run/modemngentod.pid)
         rm /var/run/modemngentod.pid
     else
-        echo "Rakitiw is not running."
+        log "Rakitiw is not running."
     fi
 }
 
@@ -114,7 +115,11 @@ rakitiw_restart() {
 while getopts ":skrpcvh" rakitiw ; do
     case $rakitiw in
         s)
-            rakitiw_start
+            if [ -f /var/run/modemngentod.pid ]; then
+                log "Rakitiw is running now"
+            else
+                rakitiw_start
+            fi
             ;;
         k)
             rakitiw_stop
