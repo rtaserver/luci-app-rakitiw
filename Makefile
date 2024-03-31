@@ -16,9 +16,6 @@ include $(INCLUDE_DIR)/package.mk
 
 define Build/Prepare
 #!/bin/sh
-	mkdir -p $(PKG_BUILD_DIR)
-	$(CP) $(CURDIR)/root $(PKG_BUILD_DIR)
-	$(CP) $(CURDIR)/luasrc $(PKG_BUILD_DIR)
 	chmod 0755 $(PKG_BUILD_DIR)/root/etc/init.d/rakitiw
 	chmod 0755 $(PKG_BUILD_DIR)/root/usr/bin/modemngentod.sh
 	chmod 0755 $(PKG_BUILD_DIR)/root/etc/uci-defaults/99_rakitiw
@@ -59,11 +56,7 @@ endef
 
 define Package/$(PKG_NAME)/install
 #!/bin/sh
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci
-	$(INSTALL_DIR) $(1)/www/rakitiw
-	$(CP) $(PKG_BUILD_DIR)/root/* $(1)/
-	$(CP) $(PKG_BUILD_DIR)/luasrc/* $(1)/usr/lib/lua/luci/
-	$(CP) $(PKG_BUILD_DIR)/www/* $(1)/www/
+
 exit 0
 endef
 
