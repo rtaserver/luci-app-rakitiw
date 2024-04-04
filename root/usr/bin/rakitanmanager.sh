@@ -1,7 +1,7 @@
 #!/bin/bash
 # Copyright 2024 RTA SERVER
 
-log_file="/var/log/modemngentod.log"
+log_file="/var/log/rakitanmanager.log"
 exec 1>>"$log_file" 2>&1
 log() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') - $1"
@@ -12,7 +12,7 @@ modem_rakitan="Disabled"
 #===============================
 apn="internet"
 host="google.com 1.1.1.1 facebook.com whatsapp.com"
-device_modem=""
+device_modem="wwan0"
 modem_port="/dev/ttyUSB0"
 interface_modem="wan1"
 max_attempts=5
@@ -62,34 +62,37 @@ fi
 
         if $status_Interrnet; then
             attempt=1
-            log "Lanjut NgePING Croot"
+            log "Lanjut NgePING..."
         fi
 
         if ! $status_Interrnet; then
             log "Internet mati. Percobaan $attempt/$max_attempts"
-            if [ "$attempt" = "2" ]; then
-                ifdown "$interface_modem"
+            if [ "$attempt" = "1" ]; then
+                ifup "$interface_modem"
                 sleep 5
-            elif [ "$attempt" = "3" ]; then
+            elif [ "$attempt" = "2" ]; then
                 echo AT+CFUN=4 | atinout - "$modem_port" -
                 sleep 4
                 echo AT+CFUN=1 | atinout - "$modem_port" -
                 sleep 5
+            elif [ "$attempt" = "3" ]; then
+                /etc/init.d/modemmanager restart
+                sleep 7
             elif [ "$attempt" = "4" ]; then
                 modem_info=$(mmcli -L)
                 modem_number=$(echo "$modem_info" | awk -F 'Modem/' '{print $2}' | awk '{print $1}')
                 mmcli -m "$modem_number" --simple-connect="apn=$apn"
-                ifdown "$interface_modem"
+                ifup "$interface_modem"
                 sleep 5      
             fi
-            ifup "$interface_modem"
             attempt=$((attempt + 1))
             sleep $delay
         fi
 
         if [ $attempt -ge $max_attempts ]; then
             log "Upaya maksimal tercapai. Internet masih mati. Restart modem akan dijalankan"
-            echo AT^RESET | atinout - "$modem_port" - && sleep 20 && ifdown "$interface_modem" && ifup "$interface_modem"
+            # echo AT^RESET | atinout - "$modem_port" - 
+            /etc/init.d/modemmanager restart && sleep 20 && ifdown "$interface_modem" && ifup "$interface_modem"
             attempt=1
         fi
         sleep 5
@@ -98,11 +101,11 @@ fi
 
 rakitiw_stop() {
     # Hentikan skrip jika sedang berjalan
-    if [ -f /var/run/modemngentod.pid ]; then
+    if [ -f /var/run/rakitanmanager.pid ]; then
         modem_rakitan="Disabled"
-        kill $(cat /var/run/modemngentod.pid)
-        rm /var/run/modemngentod.pid
-        pid=$(pgrep -f modemngentod.sh) && kill $pid
+        kill $(cat /var/run/rakitanmanager.pid)
+        rm /var/run/rakitanmanager.pid
+        pid=$(pgrep -f rakitanmanager.sh) && kill $pid
     else
         log "Rakitiw is not running."
     fi
@@ -111,7 +114,7 @@ rakitiw_stop() {
 while getopts ":skrpcvh" rakitiw ; do
     case $rakitiw in
         s)
-            if [ -f /var/run/modemngentod.pid ]; then
+            if [ -f /var/run/rakitanmanager.pid ]; then
                 log "Rakitiw is running now"
             else
                 rakitiw_start

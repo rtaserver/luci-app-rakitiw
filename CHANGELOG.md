@@ -1,3 +1,6 @@
+**Changelog** V1.2.0
+- Ganti Beberapa String
+
 **Changelog** V1.1.9
 - Penambahan Startup
 - Penambahan Tools Host To IP

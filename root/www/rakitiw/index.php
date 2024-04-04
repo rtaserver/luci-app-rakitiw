@@ -1,6 +1,6 @@
 <?php
 // Lokasi file bash
-$bash_file = '/usr/bin/modemngentod.sh';
+$bash_file = '/usr/bin/rakitanmanager.sh';
 
 // Baca file bash
 $bash_content = file_get_contents($bash_file);
@@ -35,17 +35,17 @@ if (isset($_POST['save'])) {
     $log_message = shell_exec("date '+%Y-%m-%d %H:%M:%S'") . " - Script Telah Diperbaharui\n";
     file_put_contents('/var/log/modemngentod.log', $log_message, FILE_APPEND);
 } elseif (isset($_POST['enable'])) {
-    exec('pid=$(pgrep -f modemngentod.sh) && kill $pid');
+    exec('pid=$(pgrep -f rakitanmanager.sh) && kill $pid');
     $log_message = shell_exec("date '+%Y-%m-%d %H:%M:%S'") . " - Script Telah Di Aktifkan\n";
     file_put_contents('/var/log/modemngentod.log', $log_message, FILE_APPEND);
     $variables['modem_rakitan'] = 'Enabled';
     $script_content = file_get_contents($bash_file);
     $script_content = preg_replace('/modem_rakitan=".+"/', 'modem_rakitan="' . "Enabled" . '"', $script_content);
     file_put_contents($bash_file, $script_content);
-    exec('/usr/bin/modemngentod.sh -s >/dev/null 2>&1 &');
+    exec('/usr/bin/rakitanmanager.sh -s >/dev/null 2>&1 &');
 } elseif (isset($_POST['disable'])) {
-    // Hentikan proses dengan nama modemngentod.sh menggunakan pkill
-    exec('pid=$(pgrep -f modemngentod.sh) && kill $pid');
+    // Hentikan proses dengan nama rakitanmanager.sh menggunakan pkill
+    exec('pid=$(pgrep -f rakitanmanager.sh) && kill $pid');
     exec('rm /var/log/modemngentod.log');
     $log_message = shell_exec("date '+%Y-%m-%d %H:%M:%S'") . " - Script Telah Di Nonaktifkan\n";
     file_put_contents('/var/log/modemngentod.log', $log_message, FILE_APPEND);
@@ -75,7 +75,7 @@ foreach ($linesnetwork as $linenetwork) {
     <?php
         $title = "Home";
         include("head.php");
-		exec('chmod -R 755 /usr/bin/modemngentod.sh');
+		exec('chmod -R 755 /usr/bin/rakitanmanager.sh');
     ?>
     <script src="lib/vendor/jquery/jquery-3.6.0.slim.min.js"></script>
     <script>
@@ -207,7 +207,7 @@ foreach ($linesnetwork as $linenetwork) {
                                 <?php if ($variables['modem_rakitan'] == 'Enabled'): ?>
                                     <button type="submit" class="btn btn-danger" name="disable">Disable</button>
                                 <?php else: ?>
-                                    <?php exec('pid=$(pgrep -f modemngentod.sh) && kill $pid'); ?>
+                                    <?php exec('pid=$(pgrep -f rakitanmanager.sh) && kill $pid'); ?>
                                     <button type="submit" class="btn btn-success" name="enable">Enable</button>
                                 <?php endif; ?>
                                 </div>

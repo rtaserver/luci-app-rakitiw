@@ -3,7 +3,7 @@
 
 START=99
 
-BIN="/usr/bin/modemngentod.sh"
+BIN="/usr/bin/rakitanmanager.sh"
 
 start() {
     if [ "$(uci get rakitiw.cfg.startup)" = "1" ]; then
