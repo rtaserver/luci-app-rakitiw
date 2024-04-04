@@ -15,10 +15,10 @@ define Package/$(PKG_NAME)/postinst
 if [ "$${IPKG_INSTROOT}" = "" ]; then
     chmod 0755 /usr/bin/rakitanmanager.sh
     chmod 0755 /etc/init.d/rakitiw
-    if [ -f /var/run/modemngentod.pid ]; then
+    if [ -f /var/run/rakitanmanager.pid ]; then
         modem_rakitan="Disabled"
-        kill $(cat /var/run/modemngentod.pid)
-        rm /var/run/modemngentod.pid
+        kill $(cat /var/run/rakitanmanager.pid)
+        rm /var/run/rakitanmanager.pid
         pid=$(pgrep -f rakitanmanager.sh) && kill $pid
     else
         echo "Rakitiw is not running."
@@ -33,10 +33,10 @@ define Package/$(PKG_NAME)/prerm
 if [ "$${IPKG_INSTROOT}" = "" ]; then
     chmod 0755 /usr/bin/rakitanmanager.sh
     chmod 0755 /etc/init.d/rakitiw
-    if [ -f /var/run/modemngentod.pid ]; then
+    if [ -f /var/run/rakitanmanager.pid ]; then
         modem_rakitan="Disabled"
-        kill $(cat /var/run/modemngentod.pid)
-        rm /var/run/modemngentod.pid
+        kill $(cat /var/run/rakitanmanager.pid)
+        rm /var/run/rakitanmanager.pid
         pid=$(pgrep -f rakitanmanager.sh) && kill $pid
     else
         echo "Rakitiw is not running."

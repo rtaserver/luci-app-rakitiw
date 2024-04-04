@@ -33,11 +33,11 @@ if (isset($_POST['save'])) {
     }
     file_put_contents($bash_file, $bash_content);
     $log_message = shell_exec("date '+%Y-%m-%d %H:%M:%S'") . " - Script Telah Diperbaharui\n";
-    file_put_contents('/var/log/modemngentod.log', $log_message, FILE_APPEND);
+    file_put_contents('/var/log/rakitanmanager.log', $log_message, FILE_APPEND);
 } elseif (isset($_POST['enable'])) {
     exec('pid=$(pgrep -f rakitanmanager.sh) && kill $pid');
     $log_message = shell_exec("date '+%Y-%m-%d %H:%M:%S'") . " - Script Telah Di Aktifkan\n";
-    file_put_contents('/var/log/modemngentod.log', $log_message, FILE_APPEND);
+    file_put_contents('/var/log/rakitanmanager.log', $log_message, FILE_APPEND);
     $variables['modem_rakitan'] = 'Enabled';
     $script_content = file_get_contents($bash_file);
     $script_content = preg_replace('/modem_rakitan=".+"/', 'modem_rakitan="' . "Enabled" . '"', $script_content);
@@ -46,9 +46,9 @@ if (isset($_POST['save'])) {
 } elseif (isset($_POST['disable'])) {
     // Hentikan proses dengan nama rakitanmanager.sh menggunakan pkill
     exec('pid=$(pgrep -f rakitanmanager.sh) && kill $pid');
-    exec('rm /var/log/modemngentod.log');
+    exec('rm /var/log/rakitanmanager.log');
     $log_message = shell_exec("date '+%Y-%m-%d %H:%M:%S'") . " - Script Telah Di Nonaktifkan\n";
-    file_put_contents('/var/log/modemngentod.log', $log_message, FILE_APPEND);
+    file_put_contents('/var/log/rakitanmanager.log', $log_message, FILE_APPEND);
     $variables['modem_rakitan'] = 'Disabled';
     $script_content = file_get_contents($bash_file);
     $script_content = preg_replace('/modem_rakitan=".+"/', 'modem_rakitan="' . "Disabled" . '"', $script_content);
