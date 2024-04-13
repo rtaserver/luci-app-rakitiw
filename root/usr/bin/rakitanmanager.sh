@@ -8,7 +8,11 @@ log() {
 }
 
 # Variabel
-modem_rakitan="Disabled"
+modem_status="Disabled"
+#===============================
+modem_rakitan="Enabled"
+modem_hp="Disabled"
+modem_orbit="Disabled"
 #===============================
 apn="internet"
 host="google.com 1.1.1.1 facebook.com whatsapp.com"
@@ -114,7 +118,7 @@ fi
 rakitiw_stop() {
     # Hentikan skrip jika sedang berjalan
     if [ -f /var/run/rakitanmanager.pid ]; then
-        modem_rakitan="Enabled"
+        modem_status="Enabled"
         kill $(cat /var/run/rakitanmanager.pid)
         rm /var/run/rakitanmanager.pid
         pid=$(pgrep -f rakitanmanager.sh) && kill $pid
