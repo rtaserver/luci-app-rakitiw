@@ -68,31 +68,43 @@ fi
         if ! $status_Interrnet; then
             log "Internet mati. Percobaan $attempt/$max_attempts"
             if [ "$attempt" = "1" ]; then
-                ifup "$interface_modem"
-                sleep 5
+                log "Melakukan Restart Interface $interface_modem"
+                ifdown "$interface_modem"
             elif [ "$attempt" = "2" ]; then
-                echo AT+CFUN=4 | atinout - "$modem_port" -
-                sleep 4
-                echo AT+CFUN=1 | atinout - "$modem_port" -
-                sleep 5
-            elif [ "$attempt" = "3" ]; then
-                /etc/init.d/modemmanager restart
-                sleep 7
-            elif [ "$attempt" = "4" ]; then
+                log "Mencoba Menghubungkan Kembali Modem Dengan APN : $apn"
                 modem_info=$(mmcli -L)
                 modem_number=$(echo "$modem_info" | awk -F 'Modem/' '{print $2}' | awk '{print $1}')
                 mmcli -m "$modem_number" --simple-connect="apn=$apn"
-                ifup "$interface_modem"
+                ifdown "$interface_modem"
+                sleep 5      
+            elif [ "$attempt" = "3" ]; then
+                if [ -z "$cfg_nodemmanager" ]; then
+                    log "Mengaktifkan Mode Pesawat $modem_port"
+                    echo AT+CFUN=4 | atinout - "$modem_port" -
+                    sleep 4
+                    log "Menonaktifkan Mode Pesawat $modem_port"
+                    echo AT+CFUN=1 | atinout - "$modem_port" -
+                else
+                    log "Restart Modem Manager"
+                    /etc/init.d/modemmanager restart
+                fi
+                sleep 5
+            elif [ "$attempt" = "4" ]; then
+                log "Mencoba Menghubungkan Kembali Modem Dengan APN : $apn"
+                modem_info=$(mmcli -L)
+                modem_number=$(echo "$modem_info" | awk -F 'Modem/' '{print $2}' | awk '{print $1}')
+                mmcli -m "$modem_number" --simple-connect="apn=$apn"
+                ifdown "$interface_modem"
                 sleep 5      
             fi
+            ifup "$interface_modem"
             attempt=$((attempt + 1))
             sleep $delay
         fi
 
         if [ $attempt -ge $max_attempts ]; then
             log "Upaya maksimal tercapai. Internet masih mati. Restart modem akan dijalankan"
-            # echo AT^RESET | atinout - "$modem_port" - 
-            /etc/init.d/modemmanager restart && sleep 20 && ifdown "$interface_modem" && ifup "$interface_modem"
+            echo AT^RESET | atinout - "$modem_port" - && sleep 20 && ifdown "$interface_modem" && ifup "$interface_modem"
             attempt=1
         fi
         sleep 5
@@ -102,7 +114,7 @@ fi
 rakitiw_stop() {
     # Hentikan skrip jika sedang berjalan
     if [ -f /var/run/rakitanmanager.pid ]; then
-        modem_rakitan="Disabled"
+        modem_rakitan="Enabled"
         kill $(cat /var/run/rakitanmanager.pid)
         rm /var/run/rakitanmanager.pid
         pid=$(pgrep -f rakitanmanager.sh) && kill $pid
