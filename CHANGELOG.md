@@ -1,3 +1,10 @@
+**Changelog** V1.2.0
+- Ganti Beberapa String
+- Penambahan Modem HP
+- Penambahan Modem Orbit / Huawei
+- Perbaikan Proses Cek PING
+- Perbaikan Bebera Typo
+
 **Changelog** V1.1.9
 - Penambahan Startup
 - Penambahan Tools Host To IP
