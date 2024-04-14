@@ -6,8 +6,10 @@ include $(TOPDIR)/rules.mk
 
 LUCI_TITLE:=Auto Reconect Modem Rakitan
 PKG_NAME:=luci-app-rakitiw
-LUCI_DEPENDS:= +modemmanager +python3-pip
+LUCI_DEPENDS:=+modemmanager +python3-pip
 PKG_VERSION:=1.2.0
+PKG_LICENSE:=Apache-2.0
+PKG_MAINTAINER:=Rizki Kotet <rizkidhc31@gmail.com>
 
 define Package/$(PKG_NAME)
 	$(call Package/luci/webtemplate)
