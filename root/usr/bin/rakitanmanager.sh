@@ -121,7 +121,7 @@ fi
             if [ "$modem_hp" = "Enabled" ]; then
                 log "Mencoba Menghubungkan Kembali Modem HP"
                 log "Mengaktifkan Mode Pesawat"
-                adb shell cmd connectivity airplane-mode enable
+                
                 sleep 2
                 log "Menonaktifkan Mode Pesawat"
                 adb shell cmd connectivity airplane-mode disable
