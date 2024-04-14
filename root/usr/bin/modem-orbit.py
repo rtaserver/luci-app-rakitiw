@@ -27,7 +27,7 @@ def main():
         client = Client(connection)
         
         try:
-            print_header("Obtaining WAN IP Address", "@kartolo112")
+            print_header("Auto Reconnect Modem Huawei", "@RTASERVER")
             
             wan_ip_address, device_name = fetch_wan_info(client)
             print_result("Device Name", device_name)
@@ -72,11 +72,11 @@ def print_result(label, value):
 
 def print_success(message):
     """Print success message."""
-    print("\n\033[92m" + message + "\033[0m")
+    print("\n" + message)
 
 def print_error(message):
     """Print error message."""
-    print("\n\033[91m" + message + "\033[0m")
+    print("\n" + message)
 
 if __name__ == "__main__":
     main()
