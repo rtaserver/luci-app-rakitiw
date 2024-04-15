@@ -16,6 +16,33 @@ for ($i = 0; $i < count($matches[1]); $i++) {
     }
 }
 
+
+$selectedModem = isset($_POST['selectedModem']) ? $_POST['selectedModem'] : null;
+
+
+// Set nilai variabel berdasarkan nilai radio button yang dipilih
+if ($selectedModem === 'rakitan') {
+    $variables['modem_rakitan'] = 'Enabled';
+    $variables['modem_hp'] = 'Disabled';
+    $variables['modem_orbit'] = 'Disabled';
+} else if ($selectedModem === 'hp') {
+    $variables['modem_rakitan'] = 'Disabled';
+    $variables['modem_hp'] = 'Enabled';
+    $variables['modem_orbit'] = 'Disabled';
+} else if ($selectedModem === 'orbit') {
+    $variables['modem_rakitan'] = 'Disabled';
+    $variables['modem_hp'] = 'Disabled';
+    $variables['modem_orbit'] = 'Enabled';
+}
+
+
+// Update variabel dalam file bash
+$updated_content = $bash_content;
+foreach ($variables as $key => $value) {
+    $updated_content = preg_replace('/' . $key . '=".*"/', $key . '="' . $value . '"', $updated_content);
+}
+file_put_contents($bash_file, $updated_content);
+
 // Cek apakah form disubmit
 if (isset($_POST['save'])) {
     // Update variabel dengan data dari form
@@ -26,43 +53,21 @@ if (isset($_POST['save'])) {
     }
 
     // Update file bash dengan variabel baru
+    $updated_content = $bash_content;
     foreach ($variables as $key => $value) {
         if ($key !== 'connect') {
-            $bash_content = preg_replace('/' . $key . '=".*"/', $key . '="' . $value . '"', $bash_content);
+            $updated_content = preg_replace('/' . $key . '=".*"/', $key . '="' . $value . '"', $updated_content);
         }
     }
-    file_put_contents($bash_file, $bash_content);
+    file_put_contents($bash_file, $updated_content);
 
-    $selectedModem = $_POST['modemType'];
-
-    // Memperbarui variabel dalam file bash berdasarkan jenis modem yang dipilih
-    switch ($selectedModem) {
-        case 'rakitan':
-            $variables['modem_rakitan'] = 'Enabled';
-            $variables['modem_hp'] = 'Disabled';
-            $variables['modem_orbit'] = 'Disabled';
-            break;
-        case 'hp':
-            $variables['modem_rakitan'] = 'Disabled';
-            $variables['modem_hp'] = 'Enabled';
-            $variables['modem_orbit'] = 'Disabled';
-            break;
-        case 'orbit':
-            $variables['modem_rakitan'] = 'Disabled';
-            $variables['modem_hp'] = 'Disabled';
-            $variables['modem_orbit'] = 'Enabled';
-            break;
-        default:
-            // Default case
-            break;
-    }
     // Update variabel dalam file bash
     $updated_content = $bash_content;
     foreach ($variables as $key => $value) {
         $updated_content = preg_replace('/' . $key . '=".*"/', $key . '="' . $value . '"', $updated_content);
     }
-
     file_put_contents($bash_file, $updated_content);
+
     $log_message = shell_exec("date '+%Y-%m-%d %H:%M:%S'") . " - Script Telah Diperbaharui\n";
     file_put_contents('/var/log/rakitanmanager.log', $log_message, FILE_APPEND);
 } elseif (isset($_POST['enable'])) {
@@ -227,14 +232,63 @@ foreach ($linesnetwork as $linenetwork) {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div id="modemRakitanFields" style="display:none;">
-                                                <div class="form-group">
-                                                    <label for="apn">APN Modem Rakitan:</label>
-                                                    <input type="text" class="form-control" placeholder="internet"
-                                                        id="apn" name="apn" value="<?= $variables['apn'] ?>" required
-                                                        <?php if ($variables['modem_status'] == 'Enabled')
-                                                            echo 'disabled'; ?>>
-                                                </div>
+                                            <div id="modemRakitanFields" style="display:block;">
+                                                <!-- Jika Rakitan Akyif -->
+                                                <?php if ($variables['modem_rakitan'] == 'Enabled'): ?>
+                                                    <div class="form-group">
+                                                        <label for="apn">APN Modem Rakitan:</label>
+                                                        <input type="text" class="form-control" placeholder="internet"
+                                                            id="apn" name="apn" value="<?= $variables['apn'] ?>" required
+                                                            <?php if ($variables['modem_status'] == 'Enabled')
+                                                                echo 'disabled'; ?>>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="interface_modem">Nama Interface Modem:</label>
+                                                        <select name="interface_modem" id="interface_modem"
+                                                            class="form-control" <?php if ($variables['modem_status'] == 'Enabled')
+                                                                echo 'disabled'; ?>>
+                                                            <?php
+                                                            foreach ($interface_modem as $interface) {
+                                                                echo "<option value=\"$interface\"";
+                                                                if ($interface == $variables['interface_modem']) {
+                                                                    echo " selected";
+                                                                }
+                                                                echo ">$interface</option>";
+                                                            }
+                                                            ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="modem_port">Port Modem AT Command Modem:</label>
+                                                        <input type="text" class="form-control" placeholder="/dev/ttyUSB0"
+                                                            id="modem_port" name="modem_port"
+                                                            value="<?= $variables['modem_port'] ?>" required <?php if ($variables['modem_status'] == 'Enabled')
+                                                                  echo 'disabled'; ?>>
+                                                    </div>
+                                                <?php endif; ?>
+                                                <?php if ($variables['modem_orbit'] == 'Enabled'): ?>
+                                                    <div class="form-group">
+                                                        <label for="ip_orbit">IP Modem Huawei / Orbit :</label>
+                                                        <input type="text" class="form-control" placeholder="192.168.8.1"
+                                                            id="ip_orbit" name="ip_orbit"
+                                                            value="<?= $variables['ip_orbit'] ?>" required <?php if ($variables['modem_status'] == 'Enabled')
+                                                                  echo 'disabled'; ?>>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="username_orbit">Username :</label>
+                                                        <input type="text" class="form-control" placeholder="admin"
+                                                            id="username_orbit" name="username_orbit"
+                                                            value="<?= $variables['username_orbit'] ?>" required <?php if ($variables['modem_status'] == 'Enabled')
+                                                                  echo 'disabled'; ?>>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="password_orbit">Password :</label>
+                                                        <input type="text" class="form-control" placeholder="admin"
+                                                            id="password_orbit" name="password_orbit"
+                                                            value="<?= $variables['password_orbit'] ?>" required <?php if ($variables['modem_status'] == 'Enabled')
+                                                                  echo 'disabled'; ?>>
+                                                    </div>
+                                                <?php endif; ?>
                                                 <div class="form-group">
                                                     <label for="host">Host / Bug Untuk Ping | Multi Host:</label>
                                                     <input type="text" class="form-control"
@@ -243,106 +297,10 @@ foreach ($linesnetwork as $linenetwork) {
                                                               echo 'disabled'; ?>>
                                                 </div>
                                                 <div class="form-group">
-                                                    <label for="interface_modem">Nama Interface Modem:</label>
-                                                    <select name="interface_modem" id="interface_modem"
-                                                        class="form-control" <?php if ($variables['modem_status'] == 'Enabled')
-                                                            echo 'disabled'; ?>>
-                                                        <?php
-                                                        foreach ($interface_modem as $interface) {
-                                                            echo "<option value=\"$interface\"";
-                                                            if ($interface == $variables['interface_modem']) {
-                                                                echo " selected";
-                                                            }
-                                                            echo ">$interface</option>";
-                                                        }
-                                                        ?>
-                                                    </select>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="device_modem">Device Modem Untuk Cek
+                                                    <label for="device_modem_rakitan">Device Modem Untuk Cek
                                                         PING:</label>
                                                     <input type="text" class="form-control"
                                                         placeholder="wwan0 Atau Di Kosongkan Default" id="device_modem"
-                                                        name="device_modem" value="<?= $variables['device_modem'] ?>"
-                                                        <?php if ($variables['modem_status'] == 'Enabled')
-                                                            echo 'disabled'; ?>>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="modem_port">Port Modem AT Command Modem:</label>
-                                                    <input type="text" class="form-control" placeholder="/dev/ttyUSB0"
-                                                        id="modem_port" name="modem_port"
-                                                        value="<?= $variables['modem_port'] ?>" required <?php if ($variables['modem_status'] == 'Enabled')
-                                                              echo 'disabled'; ?>>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="delay">Jeda Waktu Detik | Untuk Percobaan Reconnect
-                                                        Modem:</label>
-                                                    <input type="number" class="form-control" placeholder="10"
-                                                        id="delay" name="delay" value="<?= $variables['delay'] ?>"
-                                                        required <?php if ($variables['modem_status'] == 'Enabled')
-                                                            echo 'disabled'; ?>>
-                                                </div>
-                                            </div>
-                                            <div id="modemHPFields" style="display:none;">
-                                                <div class="form-group">
-                                                    <label for="host">Host / Bug Untuk Ping | Multi Host:</label>
-                                                    <input type="text" class="form-control"
-                                                        placeholder="1.1.1.1 8.8.8.8 google.com" id="host" name="host"
-                                                        value="<?= $variables['host'] ?>" required <?php if ($variables['modem_status'] == 'Enabled')
-                                                              echo 'disabled'; ?>>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="device_modem">Device Modem Untuk Cek
-                                                        PING:</label>
-                                                    <input type="text" class="form-control"
-                                                        placeholder="tethring1 Atau Di Kosongkan Default" id="device_modem"
-                                                        name="device_modem" value="<?= $variables['device_modem'] ?>"
-                                                        <?php if ($variables['modem_status'] == 'Enabled')
-                                                            echo 'disabled'; ?>>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="delay">Jeda Waktu Detik | Untuk Percobaan Reconnect
-                                                        Modem:</label>
-                                                    <input type="number" class="form-control" placeholder="10"
-                                                        id="delay" name="delay" value="<?= $variables['delay'] ?>"
-                                                        required <?php if ($variables['modem_status'] == 'Enabled')
-                                                            echo 'disabled'; ?>>
-                                                </div>
-                                            </div>
-                                            <div id="modemOrbitFields" style="display:none;">
-                                                <div class="form-group">
-                                                    <label for="ip_orbit">IP Modem Huawei / Orbit :</label>
-                                                    <input type="text" class="form-control" placeholder="192.168.8.1"
-                                                        id="ip_orbit" name="ip_orbit"
-                                                        value="<?= $variables['ip_orbit'] ?>" required <?php if ($variables['modem_status'] == 'Enabled')
-                                                              echo 'disabled'; ?>>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="username_orbit">Username :</label>
-                                                    <input type="text" class="form-control" placeholder="admin"
-                                                        id="username_orbit" name="username_orbit"
-                                                        value="<?= $variables['username_orbit'] ?>" required <?php if ($variables['modem_status'] == 'Enabled')
-                                                              echo 'disabled'; ?>>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="password_orbit">Password :</label>
-                                                    <input type="text" class="form-control" placeholder="admin"
-                                                        id="password_orbit" name="password_orbit"
-                                                        value="<?= $variables['password_orbit'] ?>" required <?php if ($variables['modem_status'] == 'Enabled')
-                                                              echo 'disabled'; ?>>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="host">Host / Bug Untuk Ping | Multi Host:</label>
-                                                    <input type="text" class="form-control"
-                                                        placeholder="1.1.1.1 8.8.8.8 google.com" id="host" name="host"
-                                                        value="<?= $variables['host'] ?>" required <?php if ($variables['modem_status'] == 'Enabled')
-                                                              echo 'disabled'; ?>>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="device_modem">Device Modem Untuk Cek
-                                                        PING:</label>
-                                                    <input type="text" class="form-control"
-                                                        placeholder="eth1 Atau Di Kosongkan Default" id="device_modem"
                                                         name="device_modem" value="<?= $variables['device_modem'] ?>"
                                                         <?php if ($variables['modem_status'] == 'Enabled')
                                                             echo 'disabled'; ?>>
@@ -392,30 +350,22 @@ foreach ($linesnetwork as $linenetwork) {
     <?php include ("javascript.php"); ?>
     <script src="js/index.js"></script>
     <script>
-        $(document).ready(function () {
-            // Menentukan tampilan awal berdasarkan nilai variabel
-            if ('<?= $variables['modem_rakitan'] ?>' === 'Enabled') {
-                $('#modemRakitanFields').show();
-            } else if ('<?= $variables['modem_hp'] ?>' === 'Enabled') {
-                $('#modemHPFields').show();
-            } else if ('<?= $variables['modem_orbit'] ?>' === 'Enabled') {
-                $('#modemOrbitFields').show();
-            }
+        $('input[type=radio][name=modemType]').change(function () {
+            // Ambil nilai radio button yang dipilih
+            var selectedModem = this.value;
 
-            // Tampilkan field sesuai dengan jenis modem yang dipilih
-            $('input[type=radio][name=modemType]').change(function () {
-                if (this.value === 'rakitan') {
-                    $('#modemRakitanFields').show();
-                    $('#modemHPFields').hide();
-                    $('#modemOrbitFields').hide();
-                } else if (this.value === 'hp') {
-                    $('#modemRakitanFields').hide();
-                    $('#modemHPFields').show();
-                    $('#modemOrbitFields').hide();
-                } else if (this.value === 'orbit') {
-                    $('#modemRakitanFields').hide();
-                    $('#modemHPFields').hide();
-                    $('#modemOrbitFields').show();
+            // Kirim permintaan AJAX ke server untuk menyimpan nilai variabel
+            $.ajax({
+                type: "POST",
+                url: "index.php", // Ganti dengan URL yang sesuai
+                data: { selectedModem: selectedModem },
+                success: function (response) {
+                    // Jika penyimpanan berhasil, reload halaman
+                    location.reload();
+                },
+                error: function (xhr, status, error) {
+                    // Handle kesalahan jika ada
+                    console.error(xhr.responseText);
                 }
             });
         });
