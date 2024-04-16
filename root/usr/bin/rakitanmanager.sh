@@ -171,7 +171,7 @@ rakitiw_stop() {
     # Hentikan skrip jika sedang berjalan
     if pidof rakitanmanager.sh > /dev/null; then
         modem_status="Disabled"
-        pkill -9 rakitanmanager.sh
+        killall -9 rakitanmanager.sh
         log "Rakitiw Berhasil Di Hentikan."
     else
         log "Rakitiw is not running."

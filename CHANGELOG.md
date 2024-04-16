@@ -1,3 +1,9 @@
+**Changelog** V1.2.2
+- Ganti Tampilan
+- Perbaikan Bug
+- Penambahan Agar Bisa Banyak Modem
+- Perbaikan Proses Cek PING
+
 **Changelog** V1.2.0
 - Ganti Beberapa String
 - Penambahan Modem HP

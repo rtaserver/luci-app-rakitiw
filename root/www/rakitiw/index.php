@@ -97,19 +97,16 @@ if ($modem_count == 0) {
 }
 
 if (isset($_POST['enable'])) {
-    exec('pid=$(pgrep -f rakitanmanager.sh) && kill $pid');
     $log_message = shell_exec("date '+%Y-%m-%d %H:%M:%S'") . " - Script Telah Di Aktifkan\n";
     file_put_contents('/var/log/rakitanmanager.log', $log_message, FILE_APPEND);
     $variables['modem_status'] = 'Enabled';
     shell_exec('/usr/bin/rakitanmanager.sh -s');
-    // Update variabel dalam file bash
     $updated_content = $bash_content;
     foreach ($variables as $key => $value) {
         $updated_content = preg_replace('/' . $key . '=".*"/', $key . '="' . $value . '"', $updated_content);
     }
     file_put_contents($bash_file, $updated_content);
 } elseif (isset($_POST['disable'])) {
-    // Hentikan proses dengan nama rakitanmanager.sh menggunakan pkill
     exec('killall -9 rakitanmanager.sh');
     exec('rm /var/log/rakitanmanager.log');
     $log_message = shell_exec("date '+%Y-%m-%d %H:%M:%S'") . " - Script Telah Di Nonaktifkan\n";
