@@ -149,6 +149,9 @@ jobs:
               ---
               INSTALL & UPGRADE
               ---
+                
+              ![Tutor Install](https://github.com/rtaserver/luci-app-rakitiw/assets/142883865/1694190b-c025-4855-a77d-8212fab27564)
+
               1. Upload File IPK Ke Folder Root (biar gampang)
               2. Buka / Akses Terminal Openwrt
               3. Stop Dan Hapus `luci-app-rakitiw` dahulu Jalankan di Terminal. Jika Fresh Install Bisa Skip Ini Lanjut No 4
