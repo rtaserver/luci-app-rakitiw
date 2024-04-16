@@ -1,3 +1,7 @@
+**Changelog** V1.2.3
+- Perbaikan Simpan Saat Edit
+- Penambahan Depends jq
+
 **Changelog** V1.2.2
 - Ganti Tampilan
 - Perbaikan Bug
