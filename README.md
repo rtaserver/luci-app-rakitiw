@@ -59,6 +59,7 @@ INFORMATION TESTED
 INSTALL & UPGRADE
 ---
 ![Nama Alternatif](/Tutor%20Install.gif)
+=======
 
 ## Abaikan Error Log Seperti Di Bawah Ini
 ### Jika Terdapat `Setup Done` dan `Configuring luci-app-rakitiw` Itu Tandanya
