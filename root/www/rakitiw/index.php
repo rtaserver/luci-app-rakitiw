@@ -401,7 +401,7 @@ foreach ($linesnetwork as $linenetwork) {
                                                                 <label for="edit_apn">APN:</label>
                                                                 <input type="text" id="edit_apn" name="edit_apn"
                                                                     class="form-control" placeholder="internet"
-                                                                    required>
+                                                                    >
                                                                 <label for="edit_interface">Interface Modem:</label>
                                                                 <select name="edit_interface" id="edit_interface"
                                                                     class="form-control">
@@ -415,7 +415,7 @@ foreach ($linesnetwork as $linenetwork) {
                                                                 <label for="edit_portat">Port Modem AT Command:</label>
                                                                 <input type="text" id="edit_portat" name="edit_portat"
                                                                     class="form-control" placeholder="/dev/ttyUSB0"
-                                                                    required>
+                                                                    >
                                                             </div>
                                                             <div class="form-group" id="edit_orbit_field">
                                                                 <label for="edit_iporbit">IP Modem:</label>

@@ -1,4 +1,7 @@
 **Changelog** V1.2.2
+- Perbaikan Simpan Saat Edit
+
+**Changelog** V1.2.2
 - Ganti Tampilan
 - Perbaikan Bug
 - Penambahan Agar Bisa Banyak Modem

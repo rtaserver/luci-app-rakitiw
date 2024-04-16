@@ -65,6 +65,10 @@ perform_ping() {
         apn=$cfg_apn
     fi
 
+    if ["$modemport" = ""]; then
+        modemport="/dev/ttyUSB0"
+    fi
+
     while true; do
         log_size=$(wc -c < "$log_file")
         max_size=$((2 * 1024))
