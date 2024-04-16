@@ -263,7 +263,8 @@ foreach ($linesnetwork as $linenetwork) {
                                                             <span aria-hidden="true">&times;</span>
                                                         </button>
                                                     </div>
-                                                    <form id="tambahModemForm" method="post">
+                                                    <form id="tambahModemForm" onsubmit="return validateFormTambah()"
+                                                        method="post">
                                                         <div class="modal-body">
                                                             <div class="form-group">
                                                                 <label for="jenis">Jenis Modem:</label><br>
@@ -290,14 +291,12 @@ foreach ($linesnetwork as $linenetwork) {
                                                             <div class="form-group">
                                                                 <label for="nama">Nama Modem:</label>
                                                                 <input type="text" id="nama" name="nama"
-                                                                    class="form-control" placeholder="Nama Bebas"
-                                                                    required>
+                                                                    class="form-control" placeholder="Nama Bebas">
                                                             </div>
                                                             <div class="form-group" id="rakitan_field">
                                                                 <label for="apn">APN:</label>
                                                                 <input type="text" id="apn" name="apn"
-                                                                    class="form-control" placeholder="internet"
-                                                                    required>
+                                                                    class="form-control" placeholder="internet">
                                                                 <label for="interface">Interface Modem:</label>
                                                                 <select name="interface" id="interface"
                                                                     class="form-control">
@@ -310,37 +309,35 @@ foreach ($linesnetwork as $linenetwork) {
                                                                 </select>
                                                                 <label for="portat">Port Modem AT Command:</label>
                                                                 <input type="text" id="portat" name="portat"
-                                                                    class="form-control" placeholder="/dev/ttyUSB0"
-                                                                    required>
+                                                                    class="form-control" placeholder="/dev/ttyUSB0">
                                                             </div>
                                                             <div class="form-group" id="orbit_field">
                                                                 <label for="iporbit">IP Modem:</label>
                                                                 <input type="text" id="iporbit" name="iporbit"
-                                                                    class="form-control" placeholder="192.168.8.1"
-                                                                    required>
+                                                                    class="form-control" placeholder="192.168.8.1">
                                                                 <label for="usernameorbit">Username:</label>
                                                                 <input type="text" id="usernameorbit"
                                                                     name="usernameorbit" class="form-control"
-                                                                    placeholder="admin" required>
+                                                                    placeholder="admin">
                                                                 <label for="passwordorbit">Password:</label>
                                                                 <input type="text" id="passwordorbit"
                                                                     name="passwordorbit" class="form-control"
-                                                                    placeholder="admin" required>
+                                                                    placeholder="admin">
                                                             </div>
                                                             <div class="form-group">
                                                                 <label for="hostbug">Host / Bug Untuk Ping | Multi
                                                                     Host:</label>
                                                                 <input type="text" id="hostbug" name="hostbug"
                                                                     class="form-control"
-                                                                    placeholder="1.1.1.1 8.8.8.8 google.com" required>
+                                                                    placeholder="1.1.1.1 8.8.8.8 google.com">
                                                                 <label for="devicemodem">Device Modem Untuk Cek
                                                                     PING:</label>
                                                                 <input type="text" id="devicemodem" name="devicemodem"
-                                                                    class="form-control" placeholder="eth1" required>
+                                                                    class="form-control" placeholder="eth1">
                                                                 <label for="delayping">Jeda Waktu Detik | Sebelum
                                                                     Melanjutkan Cek PING:</label>
                                                                 <input type="text" id="delayping" name="delayping"
-                                                                    class="form-control" placeholder="15" required>
+                                                                    class="form-control" placeholder="15">
                                                             </div>
                                                         </div>
                                                         <div class="modal-footer">
@@ -365,7 +362,8 @@ foreach ($linesnetwork as $linenetwork) {
                                                             <span aria-hidden="true">&times;</span>
                                                         </button>
                                                     </div>
-                                                    <form id="editModemForm" method="post">
+                                                    <form id="editModemForm" onsubmit="return validateFormEdit()"
+                                                        method="post">
                                                         <div class="modal-body">
                                                             <div class="form-group">
                                                                 <label for="edit_jenis">Jenis Modem:</label><br>
@@ -394,14 +392,12 @@ foreach ($linesnetwork as $linenetwork) {
                                                             <div class="form-group">
                                                                 <label for="edit_nama">Nama Modem:</label>
                                                                 <input type="text" id="edit_nama" name="edit_nama"
-                                                                    class="form-control" placeholder="Nama Bebas"
-                                                                    required>
+                                                                    class="form-control" placeholder="Nama Bebas">
                                                             </div>
                                                             <div class="form-group" id="edit_rakitan_field">
                                                                 <label for="edit_apn">APN:</label>
                                                                 <input type="text" id="edit_apn" name="edit_apn"
-                                                                    class="form-control" placeholder="internet"
-                                                                    >
+                                                                    class="form-control" placeholder="internet">
                                                                 <label for="edit_interface">Interface Modem:</label>
                                                                 <select name="edit_interface" id="edit_interface"
                                                                     class="form-control">
@@ -414,39 +410,37 @@ foreach ($linesnetwork as $linenetwork) {
                                                                 </select>
                                                                 <label for="edit_portat">Port Modem AT Command:</label>
                                                                 <input type="text" id="edit_portat" name="edit_portat"
-                                                                    class="form-control" placeholder="/dev/ttyUSB0"
-                                                                    >
+                                                                    class="form-control" placeholder="/dev/ttyUSB0">
                                                             </div>
                                                             <div class="form-group" id="edit_orbit_field">
                                                                 <label for="edit_iporbit">IP Modem:</label>
                                                                 <input type="text" id="edit_iporbit" name="edit_iporbit"
-                                                                    class="form-control" placeholder="192.168.8.1"
-                                                                    required>
+                                                                    class="form-control" placeholder="192.168.8.1">
                                                                 <label for="edit_usernameorbit">Username:</label>
                                                                 <input type="text" id="edit_usernameorbit"
                                                                     name="edit_usernameorbit" class="form-control"
-                                                                    placeholder="admin" required>
+                                                                    placeholder="admin">
                                                                 <label for="edit_passwordorbit">Password:</label>
                                                                 <input type="text" id="edit_passwordorbit"
                                                                     name="edit_passwordorbit" class="form-control"
-                                                                    placeholder="admin" required>
+                                                                    placeholder="admin">
                                                             </div>
                                                             <div class="form-group">
                                                                 <label for="edit_hostbug">Host / Bug Untuk Ping | Multi
                                                                     Host:</label>
                                                                 <input type="text" id="edit_hostbug" name="edit_hostbug"
                                                                     class="form-control"
-                                                                    placeholder="1.1.1.1 8.8.8.8 google.com" required>
+                                                                    placeholder="1.1.1.1 8.8.8.8 google.com">
                                                                 <label for="edit_devicemodem">Device Modem Untuk Cek
                                                                     PING:</label>
                                                                 <input type="text" id="edit_devicemodem"
                                                                     name="edit_devicemodem" class="form-control"
-                                                                    placeholder="eth1" required>
+                                                                    placeholder="eth1">
                                                                 <label for="edit_delayping">Jeda Waktu Detik | Sebelum
                                                                     Melanjutkan Cek PING:</label>
                                                                 <input type="text" id="edit_delayping"
                                                                     name="edit_delayping" class="form-control"
-                                                                    placeholder="15" required>
+                                                                    placeholder="15">
                                                             </div>
                                                         </div>
                                                         <div class="modal-footer">
@@ -512,29 +506,6 @@ foreach ($linesnetwork as $linenetwork) {
             // Tampilkan bidang rakitan saat halaman dimuat karena itu default
             $('#rakitan_field').show();
 
-            // Fungsi untuk menetapkan keharusan bidang berdasarkan jenis modem yang dipilih
-            function setRequiredFields() {
-                var jenisModem = $('input[name="jenis"]:checked').val();
-                if (jenisModem === 'rakitan') {
-                    $('#rakitan_field input, #rakitan_field select').prop('required', true);
-                    $('#hp_field input, #hp_field select, #orbit_field input, #orbit_field select').prop('required', false);
-                } else if (jenisModem === 'hp') {
-                    $('#hp_field input, #hp_field select').prop('required', true);
-                    $('#rakitan_field input, #rakitan_field select, #orbit_field input, #orbit_field select').prop('required', false);
-                } else if (jenisModem === 'orbit') {
-                    $('#orbit_field input, #orbit_field select').prop('required', true);
-                    $('#rakitan_field input, #rakitan_field select, #hp_field input, #hp_field select').prop('required', false);
-                }
-            }
-
-            // Panggil fungsi saat halaman dimuat untuk menetapkan keharusan awal
-            setRequiredFields();
-
-            // Saat pilihan jenis modem berubah, atur kembali keharusan bidang
-            $('input[name="jenis"]').change(function () {
-                setRequiredFields();
-            });
-
             $('#rakitan').change(function () {
                 if ($(this).is(':checked')) {
                     $('#rakitan_field').show();
@@ -585,6 +556,106 @@ foreach ($linesnetwork as $linenetwork) {
                 statusBerjalan = !statusBerjalan;
             });
         });
+
+        // Function to validate form fields
+        function validateFormTambah() {
+            var jenis = document.querySelector('input[name="jenis"]:checked');
+            var nama = document.getElementById("nama").value.trim();
+            var apn = document.getElementById("apn").value.trim();
+            var interface = document.getElementById("interface").value.trim();
+            var portat = document.getElementById("portat").value.trim();
+            var iporbit = document.getElementById("iporbit").value.trim();
+            var usernameorbit = document.getElementById("usernameorbit").value.trim();
+            var passwordorbit = document.getElementById("passwordorbit").value.trim();
+            var hostbug = document.getElementById("hostbug").value.trim();
+            var devicemodem = document.getElementById("devicemodem").value.trim();
+            var delayping = document.getElementById("delayping").value.trim();
+
+            if (!jenis) {
+                alert("Pilih jenis modem!");
+                return false;
+            }
+            if (nama === "") {
+                alert("Nama modem harus diisi!");
+                return false;
+            }
+            if (jenis.value === "rakitan" && apn === "") {
+                alert("APN harus diisi untuk modem rakitan!");
+                return false;
+            }
+            if (jenis.value === "rakitan" && portat === "") {
+                alert("Port modem AT Command harus diisi untuk modem rakitan!");
+                return false;
+            }
+            if (jenis.value === "orbit") {
+                if (iporbit === "" || usernameorbit === "" || passwordorbit === "") {
+                    alert("Semua bidang IP Modem, Username, dan Password harus diisi untuk modem orbit!");
+                    return false;
+                }
+            }
+            if (hostbug === "") {
+                alert("Host / Bug untuk ping harus diisi!");
+                return false;
+            }
+            if (devicemodem === "") {
+                alert("Device modem untuk cek PING harus diisi!");
+                return false;
+            }
+            if (delayping === "") {
+                alert("Jeda waktu detik sebelum melanjutkan cek PING harus diisi!");
+                return false;
+            }
+            return true;
+        }
+        function validateFormEdit() {
+            var jenis = document.querySelector('input[name="edit_jenis"]:checked');
+            var nama = document.getElementById("edit_nama").value.trim();
+            var apn = document.getElementById("edit_apn").value.trim();
+            var interface = document.getElementById("edit_interface").value.trim();
+            var portat = document.getElementById("edit_portat").value.trim();
+            var iporbit = document.getElementById("edit_iporbit").value.trim();
+            var usernameorbit = document.getElementById("edit_usernameorbit").value.trim();
+            var passwordorbit = document.getElementById("edit_passwordorbit").value.trim();
+            var hostbug = document.getElementById("edit_hostbug").value.trim();
+            var devicemodem = document.getElementById("edit_devicemodem").value.trim();
+            var delayping = document.getElementById("edit_delayping").value.trim();
+
+            if (!jenis) {
+                alert("Pilih jenis modem!");
+                return false;
+            }
+            if (nama === "") {
+                alert("Nama modem harus diisi!");
+                return false;
+            }
+            if (jenis.value === "rakitan" && apn === "") {
+                alert("APN harus diisi untuk modem rakitan!");
+                return false;
+            }
+            if (jenis.value === "rakitan" && portat === "") {
+                alert("Port modem AT Command harus diisi untuk modem rakitan!");
+                return false;
+            }
+            if (jenis.value === "orbit") {
+                if (iporbit === "" || usernameorbit === "" || passwordorbit === "") {
+                    alert("Semua bidang IP Modem, Username, dan Password harus diisi untuk modem orbit!");
+                    return false;
+                }
+            }
+            if (hostbug === "") {
+                alert("Host / Bug untuk ping harus diisi!");
+                return false;
+            }
+            if (devicemodem === "") {
+                alert("Device modem untuk cek PING harus diisi!");
+                return false;
+            }
+            if (delayping === "") {
+                alert("Jeda waktu detik sebelum melanjutkan cek PING harus diisi!");
+                return false;
+            }
+            return true;
+        }
     </script>
 </body>
 
