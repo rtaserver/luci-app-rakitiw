@@ -58,13 +58,10 @@ INFORMATION TESTED
 ---
 INSTALL & UPGRADE
 ---
-<p align="center">
-    <video src="Tutor Install.mp4">
-</p>
+![Nama Alternatif](/Tutor%20Install.gif)
 
 ## Abaikan Error Log Seperti Di Bawah Ini
-### Jika Terdapat `Setup Done` dan `Configuring luci-app-rakitiw` Itu Tandanya Berhasil
-
+### Jika Terdapat `Setup Done` dan `Configuring luci-app-rakitiw` Itu Tandanya
 <p align="center">
     <img src="errorlog.png">
 </p>
