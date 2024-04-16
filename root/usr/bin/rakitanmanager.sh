@@ -152,7 +152,7 @@ perform_ping() {
                 adb shell cmd connectivity airplane-mode disable
             elif [ "$jenis" = "orbit" ]; then
                 log "[$jenis - $nama] Mencoba Menghubungkan Kembali Modem Orbit / Huawei"
-                #python3 /usr/bin/modem-orbit.py $iporbit $usernameorbit $passwordorbit
+                python3 /usr/bin/modem-orbit.py $iporbit $usernameorbit $passwordorbit
             fi
         fi
         sleep "$delayping"
