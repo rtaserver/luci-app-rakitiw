@@ -134,9 +134,12 @@ perform_ping() {
             elif [ "$jenis" = "hp" ]; then
                 log "[$jenis - $nama] Mencoba Menghubungkan Kembali"
                 log "[$jenis - $nama] Mengaktifkan Mode Pesawat"
+                adb shell cmd connectivity airplane-mode enable
                 sleep 2
                 log "[$jenis - $nama] Menonaktifkan Mode Pesawat"
                 adb shell cmd connectivity airplane-mode disable
+                sleep 7
+                adb shell ip addr show rmnet_data0 | grep 'inet ' | cut -d ' ' -f 6 | cut -d / -f 1
             elif [ "$jenis" = "orbit" ]; then
                 log "[$jenis - $nama] Mencoba Menghubungkan Kembali Modem Orbit / Huawei"
                 python3 /usr/bin/modem-orbit.py $iporbit $usernameorbit $passwordorbit
