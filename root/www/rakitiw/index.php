@@ -293,7 +293,7 @@ foreach ($linesnetwork as $linenetwork) {
                                                             <div class="form-group">
                                                                 <label for="nama">Nama Modem:</label>
                                                                 <input type="text" id="nama" name="nama"
-                                                                    class="form-control" placeholder="Modem Bebas"
+                                                                    class="form-control" placeholder="Nama Bebas"
                                                                     required>
                                                             </div>
                                                             <div class="form-group" id="rakitan_field">
@@ -313,18 +313,22 @@ foreach ($linesnetwork as $linenetwork) {
                                                                 </select>
                                                                 <label for="portat">Port Modem AT Command:</label>
                                                                 <input type="text" id="portat" name="portat"
-                                                                    class="form-control" required>
+                                                                    class="form-control" placeholder="/dev/ttyUSB0"
+                                                                    required>
                                                             </div>
                                                             <div class="form-group" id="orbit_field">
                                                                 <label for="iporbit">IP Modem:</label>
                                                                 <input type="text" id="iporbit" name="iporbit"
-                                                                    class="form-control" required>
+                                                                    class="form-control" placeholder="192.168.8.1"
+                                                                    required>
                                                                 <label for="usernameorbit">Username:</label>
                                                                 <input type="text" id="usernameorbit"
-                                                                    name="usernameorbit" class="form-control" required>
+                                                                    name="usernameorbit" class="form-control"
+                                                                    placeholder="admin" required>
                                                                 <label for="passwordorbit">Password:</label>
                                                                 <input type="text" id="passwordorbit"
-                                                                    name="passwordorbit" class="form-control" required>
+                                                                    name="passwordorbit" class="form-control"
+                                                                    placeholder="admin" required>
                                                             </div>
                                                             <div class="form-group">
                                                                 <label for="hostbug">Host / Bug Untuk Ping | Multi
@@ -335,11 +339,11 @@ foreach ($linesnetwork as $linenetwork) {
                                                                 <label for="devicemodem">Device Modem Untuk Cek
                                                                     PING:</label>
                                                                 <input type="text" id="devicemodem" name="devicemodem"
-                                                                    class="form-control" required>
+                                                                    class="form-control" placeholder="eth1" required>
                                                                 <label for="delayping">Jeda Waktu Detik | Sebelum
                                                                     Melanjutkan Cek PING:</label>
                                                                 <input type="text" id="delayping" name="delayping"
-                                                                    class="form-control" required>
+                                                                    class="form-control" placeholder="15" required>
                                                             </div>
                                                         </div>
                                                         <div class="modal-footer">
@@ -393,12 +397,14 @@ foreach ($linesnetwork as $linenetwork) {
                                                             <div class="form-group">
                                                                 <label for="edit_nama">Nama Modem:</label>
                                                                 <input type="text" id="edit_nama" name="edit_nama"
-                                                                    class="form-control" required>
+                                                                    class="form-control" placeholder="Nama Bebas"
+                                                                    required>
                                                             </div>
                                                             <div class="form-group" id="edit_rakitan_field">
                                                                 <label for="edit_apn">APN:</label>
                                                                 <input type="text" id="edit_apn" name="edit_apn"
-                                                                    class="form-control" required>
+                                                                    class="form-control" placeholder="internet"
+                                                                    required>
                                                                 <label for="edit_interface">Interface Modem:</label>
                                                                 <select name="edit_interface" id="edit_interface"
                                                                     class="form-control">
@@ -411,20 +417,22 @@ foreach ($linesnetwork as $linenetwork) {
                                                                 </select>
                                                                 <label for="edit_portat">Port Modem AT Command:</label>
                                                                 <input type="text" id="edit_portat" name="edit_portat"
-                                                                    class="form-control" required>
+                                                                    class="form-control" placeholder="/dev/ttyUSB0"
+                                                                    required>
                                                             </div>
                                                             <div class="form-group" id="edit_orbit_field">
                                                                 <label for="edit_iporbit">IP Modem:</label>
                                                                 <input type="text" id="edit_iporbit" name="edit_iporbit"
-                                                                    class="form-control" required>
+                                                                    class="form-control" placeholder="192.168.8.1"
+                                                                    required>
                                                                 <label for="edit_usernameorbit">Username:</label>
                                                                 <input type="text" id="edit_usernameorbit"
                                                                     name="edit_usernameorbit" class="form-control"
-                                                                    required>
+                                                                    placeholder="admin" required>
                                                                 <label for="edit_passwordorbit">Password:</label>
                                                                 <input type="text" id="edit_passwordorbit"
                                                                     name="edit_passwordorbit" class="form-control"
-                                                                    required>
+                                                                    placeholder="admin" required>
                                                             </div>
                                                             <div class="form-group">
                                                                 <label for="edit_hostbug">Host / Bug Untuk Ping | Multi
@@ -436,11 +444,12 @@ foreach ($linesnetwork as $linenetwork) {
                                                                     PING:</label>
                                                                 <input type="text" id="edit_devicemodem"
                                                                     name="edit_devicemodem" class="form-control"
-                                                                    required>
+                                                                    placeholder="eth1" required>
                                                                 <label for="edit_delayping">Jeda Waktu Detik | Sebelum
                                                                     Melanjutkan Cek PING:</label>
                                                                 <input type="text" id="edit_delayping"
-                                                                    name="edit_delayping" class="form-control" required>
+                                                                    name="edit_delayping" class="form-control"
+                                                                    placeholder="15" required>
                                                             </div>
                                                         </div>
                                                         <div class="modal-footer">
