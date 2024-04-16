@@ -1,3 +1,6 @@
+**Changelog** V1.2.4
+- Fix Bug
+
 **Changelog** V1.2.3
 - Perbaikan Simpan Saat Edit
 - Penambahan Depends jq

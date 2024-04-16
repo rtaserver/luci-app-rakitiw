@@ -41,37 +41,24 @@ parse_json() {
 }
 
 perform_ping() {
-    local nama="${1:-}"
-    local jenis="${2:-}"
-    local host="${3:-}"
-    local devicemodem="${4:-}"
-    local delayping="${5:-}"
-    local apn="${6:-}"
-    local modemport="${7:-}"
-    local interface="${8:-}"
-    local iporbit="${9:-}"
-    local usernameorbit="${10:-}"
-    local passwordorbit="${11:-}"
+    nama="${1:-}"
+    jenis="${2:-}"
+    host="${3:-}"
+    devicemodem="${4:-}"
+    delayping="${5:-}"
+    apn="${6:-}"
+    modemport="${7:-}"
+    interface="${8:-}"
+    iporbit="${9:-}"
+    usernameorbit="${10:-}"
+    passwordorbit="${11:-}"
 
-    local max_attempts=5
-    local attempt=1
-
-    local cfg_nodemmanager=$(awk '/option proto '"'"'modemmanager'"'"'/ {print NR}' /etc/config/network)
-
-    if [ -z "$cfg_nodemmanager" ]; then
-        apn=$apn
-    else
-        cfg_apn=$(awk -v cfg_nodemmanager=$cfg_nodemmanager 'NR>cfg_nodemmanager {if ($1=="option" && $2=="apn") print $3; if ($1=="config") exit}' /etc/config/network | tr -d "'")
-        apn=$cfg_apn
-    fi
-
-    if ["$modemport" = ""]; then
-        modemport="/dev/ttyUSB0"
-    fi
+    max_attempts=5
+    attempt=1
 
     while true; do
         log_size=$(wc -c < "$log_file")
-        max_size=$((2 * 1024))
+        max_size=$((2 * 2048))
         if [ "$log_size" -gt "$max_size" ]; then
             # Kosongkan isi file log
             echo -n "" > "$log_file"
@@ -82,12 +69,11 @@ perform_ping() {
 
         for pinghost in $host; do
             if [ "$devicemodem" = "" ]; then
-                ping -q -c 1 -W 1 ${pinghost} > /dev/null
+                ping -q -c 3 -W 3 ${pinghost} > /dev/null
                 if [ $? -eq 0 ]; then
                     log "[$jenis - $nama] $pinghost dapat dijangkau"
                     status_Internet=true
                     attempt=1
-                    log "[$jenis - $nama] Lanjut NgePING..."
                 else
                     log "[$jenis - $nama] $pinghost tidak dapat dijangkau"
                 fi
@@ -96,6 +82,7 @@ perform_ping() {
                 if [ $? -eq 0 ]; then
                     log "[$jenis - $nama] $pinghost dapat dijangkau Dengan Interface $devicemodem"
                     status_Internet=true
+                    attempt=1
                 else
                     log "[$jenis - $nama] $pinghost tidak dapat dijangkau Dengan Interface $devicemodem"
                 fi
