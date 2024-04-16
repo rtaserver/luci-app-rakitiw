@@ -58,10 +58,12 @@ INFORMATION TESTED
 ---
 INSTALL & UPGRADE
 ---
-<p align="center">
-    <video src="Tutor Install.mp4">
-</p>
 
+<video width="320" height="240" controls>
+  <source src="Tutor Install.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+	    
 ## Abaikan Error Log Seperti Di Bawah Ini
 ### Jika Terdapat `Setup Done` dan `Configuring luci-app-rakitiw` Itu Tandanya Berhasil
 
