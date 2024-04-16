@@ -14,11 +14,24 @@ fi
 mv "/usr/lib/ModemManager/connection.d/rakitiw" "/usr/lib/ModemManager/connection.d/10-report-down-and-reconnect"
 chmod +x /usr/lib/ModemManager/connection.d/10-report-down-and-reconnect
 
-echo "Update and install prerequisites"
-pip3 install requests
-sleep 1
-clear
-pip3 install huawei-lte-api
-sleep 1
+if which pip3 >/dev/null; then
+    # Instal paket 'requests' jika belum terinstal
+    if ! pip3 show requests >/dev/null; then
+        echo "Installing package 'requests'"
+        pip3 install requests
+    else
+        echo "Package 'requests' already installed"
+    fi
+
+    # Instal paket 'huawei-lte-api' jika belum terinstal
+    if ! pip3 show huawei-lte-api >/dev/null; then
+        echo "Installing package 'huawei-lte-api'"
+        pip3 install huawei-lte-api
+    else
+        echo "Package 'huawei-lte-api' already installed"
+    fi
+else
+    echo "Error: 'pip3' command not found"
+fi
 
 echo "Setup Done"
