@@ -7,7 +7,7 @@ include $(TOPDIR)/rules.mk
 LUCI_TITLE:=Auto Reconect Modem Rakitan
 PKG_NAME:=luci-app-rakitiw
 LUCI_DEPENDS:=+modemmanager +python3-pip
-PKG_VERSION:=1.2.1
+PKG_VERSION:=1.2.2
 PKG_LICENSE:=Apache-2.0
 PKG_MAINTAINER:=Rizki Kotet <rizkidhc31@gmail.com>
 
@@ -35,9 +35,8 @@ endef
 define Package/$(PKG_NAME)/postinst
 #!/bin/sh
     if [ -f /var/run/rakitanmanager.pid ]; then
-        kill $(cat /var/run/rakitanmanager.pid)
         rm /var/run/rakitanmanager.pid
-        pid=$(pgrep -f rakitanmanager.sh) && kill $pid
+        killall -9 rakitanmanager.sh
     else
         echo "Rakitiw is not running."
     fi
@@ -78,9 +77,8 @@ define Package/$(PKG_NAME)/postrm
 	fi
 	unset NAMAPAKET
     if [ -f /var/run/rakitanmanager.pid ]; then
-        kill $(cat /var/run/rakitanmanager.pid)
         rm /var/run/rakitanmanager.pid
-        pid=$(pgrep -f rakitanmanager.sh) && kill $pid
+        killall -9 rakitanmanager.sh
     else
         echo "Rakitiw is not running."
     fi

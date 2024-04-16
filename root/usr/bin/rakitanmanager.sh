@@ -7,41 +7,68 @@ log() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') - $1"
 }
 
-# Variabel
 modem_status="Disabled"
-#===============================
-modem_rakitan="Enabled"
-modem_hp="Disabled"
-modem_orbit="Disabled"
-#===============================
-apn="internet"
-host="google.com 1.1.1.1"
-device_modem="wwan0"
-modem_port="/dev/ttyUSB0"
-interface_modem="wan1"
-max_attempts=5
-attempt=1
-delay="20"
-#===============================
-ip_orbit="192.168.8.1"
-username_orbit="admin"
-password_orbit="admin"
-#===============================
-rakitiw_start() {
-cfg_nodemmanager=$(awk '/option proto '"'"'modemmanager'"'"'/ {print NR}' /etc/config/network)
 
-if [ -z "$cfg_nodemmanager" ]; then
-    apn=$apn
-else
-    cfg_apn=$(awk -v cfg_nodemmanager=$cfg_nodemmanager 'NR>cfg_nodemmanager {if ($1=="option" && $2=="apn") print $3; if ($1=="config") exit}' /etc/config/network | tr -d "'")
-    apn=$cfg_apn
-fi
+# Baca file JSON
+json_file="/www/rakitiw/data_modem.json"
+jenis_modem=()
+nama_modem=()
+apn_modem=()
+interface_modem=()
+portat_modem=()
+iporbit_modem=()
+usernameorbit_modem=()
+passwordorbit_modem=()
+hostbug_modem=()
+devicemodem_modem=()
+delayping_modem=()
+
+parse_json() {
+    modems=$(jq -r '.modems | length' "$json_file")
+    for ((i = 0; i < modems; i++)); do
+        jenis_modem[$i]=$(jq -r ".modems[$i].jenis" "$json_file")
+        nama_modem[$i]=$(jq -r ".modems[$i].nama" "$json_file")
+        apn_modem[$i]=$(jq -r ".modems[$i].apn" "$json_file")
+        interface_modem[$i]=$(jq -r ".modems[$i].interface" "$json_file")
+        portat_modem[$i]=$(jq -r ".modems[$i].portat" "$json_file")
+        iporbit_modem[$i]=$(jq -r ".modems[$i].iporbit" "$json_file")
+        usernameorbit_modem[$i]=$(jq -r ".modems[$i].usernameorbit" "$json_file")
+        passwordorbit_modem[$i]=$(jq -r ".modems[$i].passwordorbit" "$json_file")
+        hostbug_modem[$i]=$(jq -r ".modems[$i].hostbug" "$json_file")
+        devicemodem_modem[$i]=$(jq -r ".modems[$i].devicemodem" "$json_file")
+        delayping_modem[$i]=$(jq -r ".modems[$i].delayping" "$json_file")
+    done
+}
+
+perform_ping() {
+    local nama="${1:-}"
+    local jenis="${2:-}"
+    local host="${3:-}"
+    local devicemodem="${4:-}"
+    local delayping="${5:-}"
+    local apn="${6:-}"
+    local modemport="${7:-}"
+    local interface="${8:-}"
+    local iporbit="${9:-}"
+    local usernameorbit="${10:-}"
+    local passwordorbit="${11:-}"
+
+    local max_attempts=5
+    local attempt=1
+
+    local cfg_nodemmanager=$(awk '/option proto '"'"'modemmanager'"'"'/ {print NR}' /etc/config/network)
+
+    if [ -z "$cfg_nodemmanager" ]; then
+        apn=$apn
+    else
+        cfg_apn=$(awk -v cfg_nodemmanager=$cfg_nodemmanager 'NR>cfg_nodemmanager {if ($1=="option" && $2=="apn") print $3; if ($1=="config") exit}' /etc/config/network | tr -d "'")
+        apn=$cfg_apn
+    fi
 
     while true; do
-
-	    log_size=$(wc -c < "$log_file")
-    	max_size=$((2 * 1024))
-    	if [ "$log_size" -gt "$max_size" ]; then
+        log_size=$(wc -c < "$log_file")
+        max_size=$((2 * 1024))
+        if [ "$log_size" -gt "$max_size" ]; then
             # Kosongkan isi file log
             echo -n "" > "$log_file"
             log "Log dibersihkan karena melebihi ukuran maksimum."
@@ -50,21 +77,21 @@ fi
         status_Internet=false
 
         for pinghost in $host; do
-            if [ "$device_modem" = "" ]; then
+            if [ "$devicemodem" = "" ]; then
                 ping -q -c 1 -W 1 ${pinghost} > /dev/null
                 if [ $? -eq 0 ]; then
-                    log "$pinghost dapat dijangkau"
+                    log "[$jenis - $nama] $pinghost dapat dijangkau"
                     status_Internet=true
                 else
-                    log "$pinghost tidak dapat dijangkau"
+                    log "[$jenis - $nama] $pinghost tidak dapat dijangkau"
                 fi
             else
-                ping -q -c 3 -W 3 -I ${device_modem} ${pinghost} > /dev/null
+                ping -q -c 3 -W 3 -I ${devicemodem} ${pinghost} > /dev/null
                 if [ $? -eq 0 ]; then
-                    log "$pinghost dapat dijangkau Dengan Interface $device_modem"
+                    log "[$jenis - $nama] $pinghost dapat dijangkau Dengan Interface $devicemodem"
                     status_Internet=true
                 else
-                    log "$pinghost tidak dapat dijangkau Dengan Interface $device_modem"
+                    log "[$jenis - $nama] $pinghost tidak dapat dijangkau Dengan Interface $devicemodem"
                 fi
             fi
         done
@@ -75,74 +102,77 @@ fi
         fi
 
         if [ "$status_Internet" = false ]; then
-            if [ "$modem_rakitan" = "Enabled" ]; then
-                log "Internet mati. Percobaan $attempt/$max_attempts"
+            if [ "$jenis" = "rakitan" ]; then
+                log "[$jenis - $nama] Internet mati. Percobaan $attempt/$max_attempts"
                 if [ "$attempt" = "1" ]; then
-                    log "Melakukan Restart Interface $interface_modem"
-                    ifdown "$interface_modem"
+                    log "[$jenis - $nama] Melakukan Restart Interface $interface"
+                    ifdown "$interface"
                 elif [ "$attempt" = "2" ]; then
-                    log "Mencoba Menghubungkan Kembali Modem Dengan APN : $apn"
+                    log "[$jenis - $nama] Mencoba Menghubungkan Kembali Modem Dengan APN : $apn"
                     modem_info=$(mmcli -L)
                     modem_number=$(echo "$modem_info" | awk -F 'Modem/' '{print $2}' | awk '{print $1}')
                     mmcli -m "$modem_number" --simple-connect="apn=$apn"
-                    ifdown "$interface_modem"
+                    ifdown "$interface"
                     sleep 5      
                 elif [ "$attempt" = "3" ]; then
                     if [ -z "$cfg_nodemmanager" ]; then
-                        log "Mengaktifkan Mode Pesawat $modem_port"
-                        echo AT+CFUN=4 | atinout - "$modem_port" -
+                        log "[$jenis - $nama] Mengaktifkan Mode Pesawat $modemport"
+                        echo AT+CFUN=4 | atinout - "$modemport" -
                         sleep 4
-                        log "Menonaktifkan Mode Pesawat $modem_port"
-                        echo AT+CFUN=1 | atinout - "$modem_port" -
+                        log "[$jenis - $nama] Menonaktifkan Mode Pesawat $modemport"
+                        echo AT+CFUN=1 | atinout - "$modemport" -
                     else
-                        log "Restart Modem Manager"
+                        log "[$jenis - $nama] Restart Modem Manager"
                         /etc/init.d/modemmanager restart
                     fi
                     sleep 5
                 elif [ "$attempt" = "4" ]; then
-                    log "Mencoba Menghubungkan Kembali Modem Dengan APN : $apn"
+                    log "[$jenis - $nama] Mencoba Menghubungkan Kembali Modem Dengan APN : $apn"
                     modem_info=$(mmcli -L)
                     modem_number=$(echo "$modem_info" | awk -F 'Modem/' '{print $2}' | awk '{print $1}')
                     mmcli -m "$modem_number" --simple-connect="apn=$apn"
-                    ifdown "$interface_modem"
+                    ifdown "$interface"
                     sleep 5      
                 fi
 
-                ifup "$interface_modem"
+                ifup "$interface"
                 attempt=$((attempt + 1))
                 
                 if [ $attempt -ge $max_attempts ]; then
-                    log "Upaya maksimal tercapai. Internet masih mati. Restart modem akan dijalankan"
-                    echo AT^RESET | atinout - "$modem_port" - && sleep 20 && ifdown "$interface_modem" && ifup "$interface_modem"
+                    log "[$jenis - $nama] Upaya maksimal tercapai. Internet masih mati. Restart modem akan dijalankan"
+                    echo AT^RESET | atinout - "$modemport" - && sleep 20 && ifdown "$interface" && ifup "$interface"
                     attempt=1
                 fi
-            fi
-
-            if [ "$modem_hp" = "Enabled" ]; then
-                log "Mencoba Menghubungkan Kembali Modem HP"
-                log "Mengaktifkan Mode Pesawat"
-                
+            elif [ "$jenis" = "hp" ]; then
+                log "[$jenis - $nama] Mencoba Menghubungkan Kembali"
+                log "[$jenis - $nama] Mengaktifkan Mode Pesawat"
                 sleep 2
-                log "Menonaktifkan Mode Pesawat"
+                log "[$jenis - $nama] Menonaktifkan Mode Pesawat"
                 adb shell cmd connectivity airplane-mode disable
-            fi
-
-            if [ "$modem_orbit" = "Enabled" ]; then
-                log "Mencoba Menghubungkan Kembali Modem Orbit / Huawei"
-                python3 /usr/bin/modem-orbit.py $ip_orbit $username_orbit $password_orbit
+            elif [ "$jenis" = "orbit" ]; then
+                log "[$jenis - $nama] Mencoba Menghubungkan Kembali Modem Orbit / Huawei"
+                #python3 /usr/bin/modem-orbit.py $iporbit $usernameorbit $passwordorbit
             fi
         fi
-        sleep $delay
+        sleep "$delayping"
+    done
+}
+
+main() {
+    parse_json
+
+    # Loop through each modem and perform actions
+    for ((i = 0; i < ${#jenis_modem[@]}; i++)); do
+        perform_ping "${nama_modem[$i]}" "${jenis_modem[$i]}" "${hostbug_modem[$i]}" "${devicemodem_modem[$i]}" "${delayping_modem[$i]}" "${apn_modem[$i]}" "${portat_modem[$i]}" "${interface_modem[$i]}" "${iporbit_modem[$i]}" "${usernameorbit_modem[$i]}" "${passwordorbit_modem[$i]}" &
     done
 }
 
 rakitiw_stop() {
     # Hentikan skrip jika sedang berjalan
-    if [ -f /var/run/rakitanmanager.pid ]; then
+    if pidof rakitanmanager.sh > /dev/null; then
         modem_status="Disabled"
-        kill $(cat /var/run/rakitanmanager.pid)
-        rm /var/run/rakitanmanager.pid
-        pid=$(pgrep -f rakitanmanager.sh) && kill $pid
+        pkill -9 rakitanmanager.sh
+        log "Rakitiw Berhasil Di Hentikan."
     else
         log "Rakitiw is not running."
     fi
@@ -151,11 +181,7 @@ rakitiw_stop() {
 while getopts ":skrpcvh" rakitiw ; do
     case $rakitiw in
         s)
-            if [ -f /var/run/rakitanmanager.pid ]; then
-                log "Rakitiw is running now"
-            else
-                rakitiw_start
-            fi
+            main
             ;;
         k)
             rakitiw_stop
