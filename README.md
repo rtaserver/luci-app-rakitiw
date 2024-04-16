@@ -58,33 +58,14 @@ INFORMATION TESTED
 ---
 INSTALL & UPGRADE
 ---
-1. Upload File IPK Ke Folder Root (biar gampang)
-2. Buka / Akses Terminal Openwrt
-3. Stop Dan Hapus `luci-app-rakitiw` dahulu Jalankan di Terminal. Jika Fresh Install Bisa Skip Ini Lanjut No 4
-```
-$ /etc/init.d/rakitiw stop
-$ opkg remove luci-app-rakitiw
-```
-4. Setelah Terhapus Jalankan Kembali Perintah ini di Terminal
-```
-$ opkg update
-$ cd /root
-$ opkg install luci-app-rakitiw*.ipk
-```
-5. Tunggu Hingga Proses Instalasi Selesai. *Pastika Ada Koneksi Internet*
-6. Jika Gagal Install Atau Upgrade Coba Update Depends Secara Manual
-```
-$ opkg update
-$ opkg install modemmanager
-$ opkg install python3-pip
-$ pip3 install requests
-$ pip3 install huawei-lte-api
-$ opkg install luci-app-rakitiw*.ipk --force-reinstall
-```
-> Abaikan Jika Ada Error Atau Warning
-7. Jika Proses Instalasi Berhasil Buka Modem Rakitan Di Tab Modem
-8. Atau Bisa : http://192.168.1.1/rakitiw - Sesuaikan Dengan IP OpenWrt
+![Nama Alternatif](/Tutor%20Install.gif)
+=======
 
+## Abaikan Error Log Seperti Di Bawah Ini
+### Jika Terdapat `Setup Done` dan `Configuring luci-app-rakitiw` Itu Tandanya
+<p align="center">
+    <img src="errorlog.png">
+</p>
 Preview
 ---
 
