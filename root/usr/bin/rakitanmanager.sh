@@ -82,6 +82,8 @@ perform_ping() {
                 if [ $? -eq 0 ]; then
                     log "[$jenis - $nama] $pinghost dapat dijangkau"
                     status_Internet=true
+                    attempt=1
+                    log "[$jenis - $nama] Lanjut NgePING..."
                 else
                     log "[$jenis - $nama] $pinghost tidak dapat dijangkau"
                 fi
@@ -95,11 +97,6 @@ perform_ping() {
                 fi
             fi
         done
-
-        if [ "$status_Internet" = true ]; then
-            attempt=1
-            log "Lanjut NgePING..."
-        fi
 
         if [ "$status_Internet" = false ]; then
             if [ "$jenis" = "rakitan" ]; then
