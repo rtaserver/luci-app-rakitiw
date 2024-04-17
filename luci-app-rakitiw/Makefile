@@ -56,8 +56,8 @@ define Package/$(PKG_NAME)/postinst
 #!/bin/sh
 	if [ -f "/tmp/rakitiw/data_modem.bak" ]; then
 		cp -rf "/tmp/rakitiw/data_modem.bak" "/www/rakitiw/data_modem.json"
-    chmod 0755 /usr/bin/rakitanmanager.sh
-    chmod 0755 /usr/bin/modem-orbit.py
+    	chmod 0755 /usr/bin/rakitanmanager.sh
+    	chmod 0755 /usr/bin/modem-orbit.py
 	fi
 	exit 0
 endef
@@ -78,7 +78,6 @@ define Package/$(PKG_NAME)/postrm
 endef
 
 define Package/$(PKG_NAME)/install
-	$(INSTALL_DIR) $(1)/etc/rakitiw
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci
 	$(INSTALL_DIR) $(1)/www/rakitiw
 	$(CP) $(PKG_BUILD_DIR)/root/* $(1)/
