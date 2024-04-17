@@ -6,8 +6,8 @@ include $(TOPDIR)/rules.mk
 
 LUCI_TITLE:=Auto Reconnect Modem Rakitan
 PKG_NAME:=luci-app-rakitiw
-LUCI_DEPENDS:=+modemmanager +python3-pip +jq
-PKG_VERSION:=1.2.5
+LUCI_DEPENDS:=+modemmanager +python3-pip +jq +adb
+PKG_VERSION:=1.2.6
 PKG_LICENSE:=Apache-2.0
 PKG_MAINTAINER:=Rizki Kotet <rizkidhc31@gmail.com>
 
@@ -71,11 +71,11 @@ endef
 
 define Package/$(PKG_NAME)/postrm
 #!/bin/sh
-export NAMAPAKET="rakitiw"
-if [ -d /www/$NAMAPAKET ] ; then
-    rm -rf /www/$NAMAPAKET
+
+if [ -d /www/rakitiw ] ; then
+    rm -rf /www/rakitiw
 fi
-unset NAMAPAKET
+
 if [ -f /var/run/rakitanmanager.pid ]; then
     rm /var/run/rakitanmanager.pid
     killall -9 rakitanmanager.sh
