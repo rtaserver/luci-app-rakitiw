@@ -2,10 +2,10 @@ name: Build New IPK Dev
 
 on:
   push:
+    paths:
+      - 'Makefile'
     branches:
       - dev
-    paths:
-     - MakeFile
   repository_dispatch:
   workflow_dispatch:
 
@@ -98,7 +98,7 @@ jobs:
           file_glob: true
           file: ${{ env.FIRMWARE }}/base/*.ipk
           asset_name: ${{ github.event.repository.name }}-${{ github.sha }}
-          tag: ${{ steps.vars.outputs.version }}
+          tag: "${{ steps.vars.outputs.version }}-beta"
           release_name: "Luci App Rakitiw Version - ${{ github.event.repository.name }} - ${{ env.DATETIME }}"
           prerelease: true
           overwrite: true
