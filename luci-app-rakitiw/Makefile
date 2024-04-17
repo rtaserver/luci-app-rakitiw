@@ -42,37 +42,19 @@ define Build/Compile
 endef
 
 define Package/$(PKG_NAME)/preinst
-#!/bin/sh
-	if [ -f "/www/rakitiw/data_modem.json" ]; then
-
-		cp -f "/www/rakitiw/data_modem.json" "/tmp/rakitiw/data_modem.bak"
-
-		rm -rf /www/rakitiw/ >/dev/null 2>&1
-	fi
-	exit 0
 endef
 
 define Package/$(PKG_NAME)/postinst
-#!/bin/sh
-	if [ -f "/tmp/rakitiw/data_modem.bak" ]; then
-		cp -rf "/tmp/rakitiw/data_modem.bak" "/www/rakitiw/data_modem.json"
-    	chmod 0755 /usr/bin/rakitanmanager.sh
-    	chmod 0755 /usr/bin/modem-orbit.py
-	fi
-	exit 0
 endef
 
 define Package/$(PKG_NAME)/prerm
 #!/bin/sh
 	/usr/bin/rakitanmanager -k
-
-	cp -f "/www/rakitiw/data_modem.json" "/tmp/rakitiw/data_modem.bak"
 	exit 0
 endef
 
 define Package/$(PKG_NAME)/postrm
 #!/bin/sh
-	rm -rf /etc/rakitiw/ >/dev/null 2>&1
 	rm -rf /www/rakitiw/ >/dev/null 2>&1
 	exit 0
 endef
