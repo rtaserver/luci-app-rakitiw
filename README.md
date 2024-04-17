@@ -19,7 +19,7 @@ This OpenWRT Custom Script For Modem
 <br>
 
 ### Wiki
-* [Home](https://github.com/vernesong/OpenClash/wiki)
+* [Home](https://github.com/rtaserver/luci-app-rakitiw/wiki)
 * [Tutorial Install](https://github.com/rtaserver/luci-app-rakitiw/wiki/Tutorial-Install)
 ---
 INFORMATION TESTED
