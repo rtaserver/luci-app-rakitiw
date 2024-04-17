@@ -32,7 +32,9 @@ jobs:
       
       - name: Get PKG_VERSION from Makefile
         id: vars
-        run: echo "::set-output name=version::$(grep 'PKG_VERSION:=' luci-app-rakitiw/Makefile | cut -d '=' -f2)"
+        run: |
+          version=$(grep 'PKG_VERSION:=' luci-app-rakitiw/Makefile | cut -d '=' -f2)
+          echo "::set-output name=version::$version"
 
       - name: Preparing Rakitiw
         run: |
@@ -42,7 +44,7 @@ jobs:
               echo "DATETIME=$(date +'%Y.%m.%d-%H:%M:%S')" >> $GITHUB_ENV
         
       - name: Building Luci App Rakitiw
-        uses: nosignals/gh-action-sdk@main
+        uses: openwrt/gh-action-sdk@main
         env:
           ARCH: ${{ matrix.arch }}-${{ matrix.release }}
           ARTIFACTS_DIR: ${{ github.workspace }}/artifacts
@@ -81,7 +83,7 @@ jobs:
           r="${r//'%'/'%25'}"
           r="${r//$'\n'/'%0A'}"
           r="${r//$'\r'/'%0D'}"  
-          echo "CHANGELOG=$r" >> $GITHUB_OUTPUT
+          echo "CHANGELOG=$r" >> $GITHUB_ENV
 
       - name: Upload Firmware to Release
         uses: svenstaro/upload-release-action@v2
