@@ -4,87 +4,86 @@
 
 include $(TOPDIR)/rules.mk
 
-LUCI_TITLE:=Auto Reconnect Modem Rakitan
+PKG_MAINTAINER:=rtaserver <https://github.com/rtaserver/luci-app-rakitiw>
 PKG_NAME:=luci-app-rakitiw
-LUCI_DEPENDS:=+modemmanager +python3-pip +jq +adb
-PKG_VERSION:=1.2.6
-PKG_LICENSE:=Apache-2.0
-PKG_MAINTAINER:=Rizki Kotet <rizkidhc31@gmail.com>
+PKG_VERSION:=1.2.7
+
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
 
 define Package/$(PKG_NAME)
-  $(call Package/luci/webtemplate)
-  TITLE:=$(LUCI_TITLE)
-  DEPENDS:=$(LUCI_DEPENDS)
+	CATEGORY:=LuCI
+	SUBMENU:=3. Applications
+	TITLE:=LuCI support for modemmanager
+	PKGARCH:=all
+	DEPENDS:=+modemmanager +python3-pip +jq +adb
 endef
 
 define Package/$(PKG_NAME)/description
-  LuCI version of Rakitiw, with some mods and additions for modem rakitan.
+    A LuCI support for modemmanager
 endef
 
-define Package/$(PKG_NAME)/install
-  $(INSTALL_DIR) $(1)/usr/lib/lua/luci
-  $(CP) ./luasrc/* $(1)/usr/lib/lua/luci/
-  $(INSTALL_DIR) $(1)/
-  $(CP) ./root/* $(1)/
-  chmod 755 $(1)/root/www/*
-  chmod 755 $(1)/root/etc/init.d/*
-  chmod 755 $(1)/root/etc/uci-defaults/*
-  chmod 755 $(1)/root/usr/bin/*
+include $(INCLUDE_DIR)/package.mk
+
+define Build/Prepare
+	mkdir -p $(PKG_BUILD_DIR)
+	$(CP) $(CURDIR)/root $(PKG_BUILD_DIR)
+	$(CP) $(CURDIR)/luasrc $(PKG_BUILD_DIR)
+	$(CP) $(CURDIR)/htdocs $(PKG_BUILD_DIR)
+	chmod 0755 $(PKG_BUILD_DIR)/root/etc/init.d/rakitiw
+	chmod 0755 $(PKG_BUILD_DIR)/root/usr/bin/rakitanmanager.sh
+  chmod 0755 $(PKG_BUILD_DIR)/root/usr/bin/modem-orbit.py
+	chmod 0755 $(PKG_BUILD_DIR)/root/etc/uci-defaults/99_rakitiw
+endef
+
+define Build/Configure
+endef
+
+define Build/Compile
+endef
+
+define Package/$(PKG_NAME)/preinst
+#!/bin/sh
+	if [ -f "/www/rakitiw/data_modem.json" ]; then
+
+		cp -f "/www/rakitiw/data_modem.json" "/tmp/rakitiw/data_modem.bak"
+
+		rm -rf /www/rakitiw/ >/dev/null 2>&1
+	fi
+	exit 0
 endef
 
 define Package/$(PKG_NAME)/postinst
 #!/bin/sh
-if [ -f /var/run/rakitanmanager.pid ]; then
-    rm /var/run/rakitanmanager.pid
-    killall -9 rakitanmanager.sh
-else
-    echo "Rakitiw is not running."
-fi
-[ -d /tmp/luci-modulecache ] && rm -rf /tmp/luci-modulecache
-find /tmp -type f -name 'luci-indexcache.*' -exec rm -f {} \;
-chmod 755 $(1)/usr/lib/lua/luci/controller/*
-chmod 755 $(1)/usr/lib/lua/luci/view/*
-chmod 755 $(1)/www/*
-chmod 755 $(1)/www/rakitiw/*
-chmod 755 $(1)/etc/init.d/rakitiw
-chmod 755 $(1)/usr/bin/rakitanmanager.sh
-chmod 755 $(1)/usr/bin/modem-orbit.py
-# Autofix download index.php, index.html
-if ! grep -q ".php=/usr/bin/php-cgi" /etc/config/uhttpd; then
-    echo -e "  rtalog : system not using php-cgi, patching php config ..."
-    logger "  rtalog : system not using php-cgi, patching php config..."
-    uci set uhttpd.main.ubus_prefix='/ubus'
-    uci set uhttpd.main.interpreter='.php=/usr/bin/php-cgi'
-    uci set uhttpd.main.index_page='cgi-bin/luci'
-    uci add_list uhttpd.main.index_page='index.html'
-    uci add_list uhttpd.main.index_page='index.php'
-    uci commit uhttpd
-    echo -e "  rtalog : patching system with php configuration done ..."
-    echo -e "  rtalog : restarting some apps ..."
-    logger "  rtalog : patching system with php configuration done..."
-    logger "  rtalog : restarting some apps..."
-    /etc/init.d/uhttpd restart
-fi
-[ -d /usr/lib/php8 ] && [ ! -d /usr/lib/php ] && ln -sf /usr/lib/php8 /usr/lib/php
-exit 0
+	if [ -f "/tmp/rakitiw/data_modem.bak" ]; then
+		cp -rf "/tmp/rakitiw/data_modem.bak" "/www/rakitiw/data_modem.json"
+    chmod 0755 /usr/bin/rakitanmanager.sh
+    chmod 0755 /usr/bin/modem-orbit.py
+	fi
+	exit 0
+endef
+
+define Package/$(PKG_NAME)/prerm
+#!/bin/sh
+	/usr/bin/rakitanmanager -k
+
+	cp -f "/www/rakitiw/data_modem.json" "/tmp/rakitiw/data_modem.bak"
+	exit 0
 endef
 
 define Package/$(PKG_NAME)/postrm
 #!/bin/sh
-
-if [ -d /www/rakitiw ] ; then
-    rm -rf /www/rakitiw
-fi
-
-if [ -f /var/run/rakitanmanager.pid ]; then
-    rm /var/run/rakitanmanager.pid
-    killall -9 rakitanmanager.sh
-else
-    echo "Rakitiw is not running."
-fi
-exit 0
+	rm -rf /etc/rakitiw/ >/dev/null 2>&1
+	rm -rf /www/rakitiw/ >/dev/null 2>&1
+	exit 0
 endef
 
-include $(TOPDIR)/feeds/luci/luci.mk
+define Package/$(PKG_NAME)/install
+	$(INSTALL_DIR) $(1)/etc/rakitiw
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci
+	$(INSTALL_DIR) $(1)/www/rakitiw
+	$(CP) $(PKG_BUILD_DIR)/root/* $(1)/
+	$(CP) $(PKG_BUILD_DIR)/luasrc/* $(1)/usr/lib/lua/luci/
+	$(CP) $(PKG_BUILD_DIR)/www/* $(1)/www/
+endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
