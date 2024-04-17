@@ -18,7 +18,9 @@ This OpenWRT Custom Script For Modem
 </p>
 <br>
 
-
+### Wiki
+* [Home](https://github.com/vernesong/OpenClash/wiki)
+* [Tutorial Install](https://github.com/rtaserver/luci-app-rakitiw/wiki/Tutorial-Install)
 ---
 INFORMATION TESTED
 ---
@@ -55,22 +57,15 @@ INFORMATION TESTED
 * Huawei 5G CPE Pro (H112-372)
 
 (probably will work for other Huawei LTE devices too)
----
-INSTALL & UPGRADE
----
-![Nama Alternatif](/Tutor%20Install.gif)
-=======
 
-## Abaikan Error Log Seperti Di Bawah Ini
-### Jika Terdapat `Setup Done` dan `Configuring luci-app-rakitiw` Itu Tandanya
-<p align="center">
-    <img src="errorlog.png">
-</p>
-Preview
 ---
 
+<h1>Support Me 
+  <p align="center">
+	<a target="_blank" href="https://saweria.co/rizkikotet">
+    <img width="300" src="Saweria_logo.png">
+    </a>
+  </p>
+</h1>
 
-* Full View
-<p align="center">
-    <img src="pc.png">
-</p>
+<h2 align="center"><a target="_blank" href="https://saweria.co/rizkikotet">Saweria : https://saweria.co/rizkikotet</a></h2>
