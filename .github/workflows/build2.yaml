@@ -3,7 +3,7 @@ name: Building Rakitiw - Dev
 on:
   push:
     paths:
-      - 'Makefile'
+      - 'luci-app-rakitiw/Makefile'
     branches:
       - dev
   repository_dispatch:
