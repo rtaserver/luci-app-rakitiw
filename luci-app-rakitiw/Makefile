@@ -31,7 +31,7 @@ define Build/Prepare
 	$(CP) $(CURDIR)/htdocs $(PKG_BUILD_DIR)
 	chmod 0755 $(PKG_BUILD_DIR)/root/etc/init.d/rakitiw
 	chmod 0755 $(PKG_BUILD_DIR)/root/usr/bin/rakitanmanager.sh
-  chmod 0755 $(PKG_BUILD_DIR)/root/usr/bin/modem-orbit.py
+  	chmod 0755 $(PKG_BUILD_DIR)/root/usr/bin/modem-orbit.py
 	chmod 0755 $(PKG_BUILD_DIR)/root/etc/uci-defaults/99_rakitiw
 endef
 
