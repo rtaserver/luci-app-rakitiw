@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - dev
+    paths:
+     - MakeFile
   repository_dispatch:
   workflow_dispatch:
 
@@ -96,23 +98,84 @@ jobs:
           file_glob: true
           file: ${{ env.FIRMWARE }}/base/*.ipk
           asset_name: ${{ github.event.repository.name }}-${{ github.sha }}
-          tag: "pre-release"
-          release_name: "1. Pre-Release Luci App Rakitiw - ${{ env.DATETIME }}"
+          tag: ${{ steps.vars.outputs.version }}
+          release_name: "Luci App Rakitiw Version - ${{ github.event.repository.name }} - ${{ env.DATETIME }}"
           prerelease: true
           overwrite: true
           body: |
             Build date: ${{ env.DATETIME }} For Version : ${{ github.event.repository.name }}
-            Tutor Install Dan Upgrade
-            ---
-            ### Install : 
-              1. Download File luci-app-rakitiw_${{ steps.vars.outputs.version }}_all.ipk
-              2. Login OpenWrt -> Masuk Ke Tab System -> Software
-              3. Klik Update List Tunggu Hingga Selesai Update
-              4. Klik Upload Package -> Browse -> Pilih .ipk Yang Sudah Di Download Tadi -> Kilik Upload -> Klik Install
-              5. Setelah Selesai Silahkan Cek Pada Bagian Tab Modem
-              6. Jika Tidak Muncul Bisa Akses Manual Di : http://192.168.1.1/rakitiw - sesuaikan dengan IP OpenWrt Masing-Masing
+        
+            ${{ steps.changelog.outputs.CHANGELOG }}
 
-            ## INFO : Jika Update Jangan Lupa Disable Terlebihdahulu :) Kalo Mau Aman Bisa Disable Terus Uninstall Baru Install Yang Baru
+            ![GitHub Downloads (all assets, specific tag)](https://img.shields.io/github/downloads/rtaserver/luci-app-rakitiw/${{ steps.vars.outputs.version }}/total?style=for-the-badge&logo=openwrt&label=Download&color=blue)
+
+            ---
+            INFORMATION TESTED
+            ---
+            #### Modem Rakitan:
+            * Dell Dw5821e
+            * Fibocom L850 GL
+            * Fibocom L860 GL
+          
+            #### Modem HP:
+            * Semua Tipe HP Root / Non Root
+            > Jangan Lupa USB Debugging Aktif
+          
+            #### Modem Huawei / Orbit:
+            * Huawei B310s-22
+            * Huawei B312-926
+            * Huawei B315s-22
+            * Huawei B525s-23a
+            * Huawei B525s-65a
+            * Huawei B715s-23c
+            * Huawei B528s
+            * Huawei B535-232
+            * Huawei B628-265
+            * Huawei B612-233
+            * Huawei B818-263
+            * Huawei E5186s-22a
+            * Huawei E5576-320
+            * Huawei E5577Cs-321
+            * Huawei E8231
+            * SoyeaLink B535-333
+            * Huawei E3131
+            * Huawei E3372
+            * Huawei E3531
+            * Huawei 5G CPE Pro 2 (H122-373)
+            * Huawei 5G CPE Pro (H112-372)
+          
+            (probably will work for other Huawei LTE devices too)
+            ---
+            INSTALL & UPGRADE
+            ---
+            
+            ![Tutor Install](https://github.com/rtaserver/luci-app-rakitiw/assets/142883865/1694190b-c025-4855-a77d-8212fab27564)
+
+            1. Upload File IPK Ke Folder Root (biar gampang)
+            2. Buka / Akses Terminal Openwrt
+            3. Stop Dan Hapus `luci-app-rakitiw` dahulu Jalankan di Terminal. Jika Fresh Install Bisa Skip Ini Lanjut No 4
+            ```
+            $ /etc/init.d/rakitiw stop
+            $ opkg remove luci-app-rakitiw
+            ```
+            4. Setelah Terhapus Jalankan Kembali Perintah ini di Terminal
+            ```
+            $ opkg update
+            $ cd /root
+            $ opkg install luci-app-rakitiw*.ipk
+            ```
+            5. Tunggu Hingga Proses Instalasi Selesai. *Pastika Ada Koneksi Internet*
+            6. Jika Gagal Install Atau Upgrade Coba Update Depends Secara Manual
+            ```
+            $ opkg update
+            $ opkg install modemmanager
+            $ opkg install python3-pip
+            $ pip3 install requests
+            $ pip3 install huawei-lte-api
+            $ opkg install luci-app-rakitiw*.ipk --force-reinstall
+            ```
+            7. Jika Proses Instalasi Berhasil Buka Modem Rakitan Di Tab Modem
+            8. Atau Bisa : http://192.168.1.1/rakitiw - Sesuaikan Dengan IP OpenWrt
 
       - name: Delete Old Workflows
         uses: Mattraks/delete-workflow-runs@main
