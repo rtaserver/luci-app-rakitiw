@@ -32,7 +32,7 @@ jobs:
       
       - name: Get PKG_VERSION from Makefile
         id: vars
-        run: echo "::set-output name=version::$(grep 'PKG_VERSION:=' Makefile | cut -d '=' -f2)"
+        run: echo "::set-output name=version::$(grep 'PKG_VERSION:=' luci-app-rakitiw/Makefile | cut -d '=' -f2)"
 
       - name: Preparing Rakitiw
         run: |
