@@ -110,6 +110,8 @@ jobs:
         
               ${{ steps.changelog.outputs.CHANGELOG }}
 
+              ![GitHub Downloads (all assets, specific tag)](https://img.shields.io/github/downloads/rtaserver/luci-app-rakitiw/${{ steps.vars.outputs.version }}/total?style=for-the-badge&logo=openwrt&label=Download&color=blue)
+
               ---
               INFORMATION TESTED
               ---
