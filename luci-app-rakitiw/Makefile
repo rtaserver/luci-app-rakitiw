@@ -15,7 +15,7 @@ define Package/$(PKG_NAME)
 	SUBMENU:=3. Applications
 	TITLE:=LuCI support for modemmanager
 	PKGARCH:=all
-	DEPENDS:=+modemmanager +python3-pip +jq +adb
+	DEPENDS:=+kmod-tun +python3-pip +bash +curl +jq
 endef
 
 define Package/$(PKG_NAME)/description
