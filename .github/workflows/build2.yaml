@@ -1,178 +1,163 @@
-name: Building Rakitiw - Dev
-
+#
+# Copyright (c) 2022-2023 SMALLPROGRAM <https://github.com/smallprogram>
+# Description: Auto compile
+#
+name: "Auto compile with openwrt sdk For Dev"
 on:
-  push:
-    paths:
-      - 'luci-app-rakitiw/Makefile'
-    branches:
-      - dev
   repository_dispatch:
   workflow_dispatch:
-        
-jobs: 
-  build_ipk:
-    permissions:
-      contents: write
-    name: Build Rakitiw
+    inputs:
+      ssh:
+        description: 'SSH connection to Actions'
+        required: false
+        default: 'false'
+  push:
+    branches:
+      - 'dev'
+    paths:
+      - 'luci-app-rakitiw/Makefile'
+env:
+  TZ: Asia/Jakarta
+  rakitiw: ${{ github.repository }}
+
+jobs:
+  job_check:
+    name: Check Version
+    runs-on: ubuntu-latest
+    outputs:
+      rakitiw_version: ${{ steps.check_version.outputs.latest_version }}
+      has_update: ${{ steps.check_version.outputs.has_update }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
+        with:
+          fetch-depth: 0
+          ref: 'dev'
+
+      - name: Check version
+        id: check_version
+        env:
+          url_release: https://api.github.com/repos/${{ env.rakitiw}}/releases/latest
+        run: |
+          cd luci-app-rakitiw
+          latest_version=$(awk -F ':=' '/PKG_VERSION|PKG_RELEASE/ {print $2}' Makefile | sed ':a;N;s/\n$//;s/\n/-/;ba')
+          latest_release=$(wget -qO- -t1 -T2 ${{env.url_release}} | awk -F '"' '/tag_name/{print $4}')
+          has_update=$([ "${latest_version}" != "${latest_release}" ] && echo true || echo false)
+          echo "latest_version=${latest_version}" >> $GITHUB_OUTPUT
+          echo "has_update=${has_update}" >> $GITHUB_OUTPUT
+          echo "latest_version: ${latest_version}"
+          echo "latest_release: ${latest_release}"
+          echo "has_update: ${has_update}"
+
+      - name: Prepare release
+        if: steps.check_version.outputs.has_update == 'true'
+        run: |
+          echo "## :mega:Update content" >> release.txt
+          echo "![](https://img.shields.io/github/downloads/${{ env.rakitiw }}/${{steps.check_version.outputs.latest_version}}/total?style=flat-square)" >> release.txt
+          echo "### rakitiw Info" >> release.txt
+          echo "**:minidisc: rakitiw Version: ${{steps.check_version.outputs.latest_version}}**" >> release.txt
+          touch release.txt
+
+      - name: Generate new tag & release
+        if: steps.check_version.outputs.has_update == 'true'
+        uses: softprops/action-gh-release@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          prerelease: true
+          tag_name: ${{steps.check_version.outputs.latest_version}}
+          body_path: release.txt
+
+
+  job_build_rakitiw:
+    name: Build rakitiw[Luci ${{ matrix.luci_ver }}]
+    needs: job_check
+    if: needs.job_check.outputs.has_update == 'true'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        release:
-          - 21.02.7
-          - 23.05.0
-        arch:
-          - x86_64
-          
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-        with:
-          ref: dev
-      
-      - name: Get PKG_VERSION from Makefile
-        id: vars
-        run: |
-          version=$(grep 'PKG_VERSION:=' luci-app-rakitiw/Makefile | cut -d '=' -f2)
-          echo "::set-output name=version::$version"
+        include:
+          - sdk_ver: 21.02
+            luci_ver: 19.07
+            sdk_url: https://downloads.openwrt.org/releases/21.02.5/targets/x86/64/openwrt-sdk-21.02.5-x86-64_gcc-8.4.0_musl.Linux-x86_64.tar.xz
 
-      - name: Preparing Rakitiw
+          - sdk_ver: 23.05
+            luci_ver: 23.05
+            sdk_url: https://downloads.openwrt.org/releases/23.05.0/targets/x86/64/openwrt-sdk-23.05.0-x86-64_gcc-12.3.0_musl.Linux-x86_64.tar.xz
+
+    steps:
+      - name: Install packages
         run: |
-              echo ""
-              mkdir feeds artifacts
-              cp -rf ./luci-app-rakitiw ./feeds
-              echo "DATETIME=$(date +'%Y.%m.%d-%H:%M:%S')" >> $GITHUB_ENV
-        
-      - name: Building Luci App Rakitiw
-        uses: openwrt/gh-action-sdk@main
+          docker rmi `docker images -q`
+          sudo -E rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d /usr/local/lib/android
+          df -hT
+          echo "Install packages"
+          sudo -E apt-get -qq update
+          sudo -E apt-get -qq install build-essential clang flex bison g++ gawk gcc-multilib g++-multilib gettext git libncurses5-dev libssl-dev python3-distutils rsync unzip zlib1g-dev file wget
+          sudo -E apt-get -qq autoremove --purge
+          sudo -E apt-get -qq clean
+
+      - name: Cache openwrt SDK
+        id: cache-sdk
+        uses: actions/cache@v4
+        with:
+          path: sdk
+          key: openwrt-sdk-23.05-rc3-x86_64
+
+      - name: Initialization environment
+        if: steps.cache-sdk.outputs.cache-hit != 'true'
         env:
-          ARCH: ${{ matrix.arch }}-${{ matrix.release }}
-          ARTIFACTS_DIR: ${{ github.workspace }}/artifacts
-          FEED_DIR: ${{ github.workspace }}/feeds
-          PACKAGES: luci-app-rakitiw
-          NO_SHFMT_CHECK: 1
-        
-      - name: Delivering Package
-        uses: actions/upload-artifact@v3
-        with:
-          name: luci-app-rakitiw-${{ matrix.release }}_${{ matrix.arch }}
-          path: ${{ github.workspace }}/artifacts/bin/packages/${{ matrix.arch }}/action/luci-app-rakitiw*
-
-  push_packages:
-    needs: build_ipk
-    name: Push Packages to Release
-    permissions:
-      contents: write  # To push a branch
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download temporary artifact
-        uses: actions/download-artifact@v3
-        
-      - name: Moving artifact to releases
-        shell: bash
+          url_sdk: https://downloads.openwrt.org/releases/23.05.0/targets/x86/64/openwrt-sdk-23.05.0-x86-64_gcc-12.3.0_musl.Linux-x86_64.tar.xz
         run: |
-          mkdir ./release
-          cp -rf ./luci-app-rakitiw-21.02.7_x86_64/* ./release/luci-app-rakitiw_${{ steps.vars.outputs.version }}_all_21_02.ipk
-          cp -rf ./luci-app-rakitiw-23.05.0_x86_64/* ./release/luci-app-rakitiw_${{ steps.vars.outputs.version }}_all_23_05.ipk
-  
-      - name: Add changelog info to new release description
-        id: changelog
-        shell: bash
-        run: |
-          r=$(awk '/^\*\*Changelog\*\*/ {if(found) exit; found=1} found' CHANGELOG.md)
-          r="${r//'%'/'%25'}"
-          r="${r//$'\n'/'%0A'}"
-          r="${r//$'\r'/'%0D'}"  
-          echo "CHANGELOG=$r" >> $GITHUB_ENV
+          wget ${{ env.url_sdk }}
+          file_name=$(echo ${{env.url_sdk}} | awk -F/ '{print $NF}')
+          mkdir sdk && tar -xJf $file_name -C ./sdk --strip-components=1
+          cd sdk
+          echo "src-git base https://github.com/openwrt/openwrt.git;openwrt-${{ matrix.sdk_ver }}" > feeds.conf
+          echo "src-git packages https://github.com/openwrt/packages.git;openwrt-${{ matrix.sdk_ver }}" >> feeds.conf
+          echo "src-git luci https://github.com/openwrt/luci.git;openwrt-${{ matrix.luci_ver }}" >> feeds.conf
+          echo "src-git routing https://git.openwrt.org/feed/routing.git;openwrt-${{ matrix.sdk_ver }}"  >> feeds.conf
+          echo "src-git rakitiw https://github.com/${{ env.rakitiw }}.git;dev" >> feeds.conf
+          ./scripts/feeds update -a
+          echo "CONFIG_PACKAGE_luci-app-rakitiw=m" > .config
+          ./scripts/feeds install -d n luci-app-rakitiw
+          make download -j8
 
-      - name: Upload Firmware to Release
-        uses: svenstaro/upload-release-action@v2
+      - name: Configure rakitiw
+        run: |
+          cd sdk
+          ./scripts/feeds update rakitiw
+          ./scripts/feeds install luci-app-rakitiw
+          echo "CONFIG_ALL_NONSHARED=n" > .config
+          echo "CONFIG_ALL_KMODS=n" >> .config
+          echo "CONFIG_ALL=n" >> .config
+          echo "CONFIG_AUTOREMOVE=n" >> .config
+
+          echo "CONFIG_PACKAGE_luci-app-rakitiw=m" >> .config
+
+          make defconfig
+
+      - name: Compile rakitiw
+        id: compile
+        run: |
+          cd sdk
+          echo "make package/luci-app-rakitiw/{clean,compile} -j$(nproc)"
+          make package/luci-app-rakitiw/{clean,compile} -j$(nproc)
+          mv bin/packages/x86_64/rakitiw/ ../
+          rm .config .config.old
+          cd ../rakitiw
+          for i in $(ls); do mv $i luci-${{ matrix.luci_ver }}_$i; done
+          cd ..
+          echo "status=success" >> $GITHUB_OUTPUT
+          echo "FIRMWARE=$PWD" >> $GITHUB_ENV
+
+      - name: Upload rakitiw ipks to release
+        uses: softprops/action-gh-release@master
+        if: steps.compile.outputs.status == 'success'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file_glob: true
-          file: ./release/*
-          asset_name: ${{ github.event.repository.name }}-${{ github.sha }}
-          tag: "${{ steps.vars.outputs.version }}-beta"
-          release_name: "Luci App Rakitiw Version - ${{ steps.vars.outputs.version }} - ${{ env.DATETIME }}"
           prerelease: true
-          overwrite: true
-          body: |
-            Build date: ${{ env.DATETIME }} For Version : ${{ steps.vars.outputs.version }}
-        
-            ${{ steps.changelog.outputs.CHANGELOG }}
-
-            ![GitHub Downloads (all assets, specific tag)](https://img.shields.io/github/downloads/rtaserver/luci-app-rakitiw/${{ steps.vars.outputs.version }}/total?style=for-the-badge&logo=openwrt&label=Download&color=blue)
-
-            ---
-            INFORMATION TESTED
-            ---
-            #### Modem Rakitan:
-            * Dell Dw5821e
-            * Fibocom L850 GL
-            * Fibocom L860 GL
-          
-            #### Modem HP:
-            * Semua Tipe HP Root / Non Root
-            > Jangan Lupa USB Debugging Aktif
-          
-            #### Modem Huawei / Orbit:
-            * Huawei B310s-22
-            * Huawei B312-926
-            * Huawei B315s-22
-            * Huawei B525s-23a
-            * Huawei B525s-65a
-            * Huawei B715s-23c
-            * Huawei B528s
-            * Huawei B535-232
-            * Huawei B628-265
-            * Huawei B612-233
-            * Huawei B818-263
-            * Huawei E5186s-22a
-            * Huawei E5576-320
-            * Huawei E5577Cs-321
-            * Huawei E8231
-            * SoyeaLink B535-333
-            * Huawei E3131
-            * Huawei E3372
-            * Huawei E3531
-            * Huawei 5G CPE Pro 2 (H122-373)
-            * Huawei 5G CPE Pro (H112-372)
-          
-            (probably will work for other Huawei LTE devices too)
-            ---
-            INSTALL & UPGRADE
-            ---
-            
-            ![Tutor Install](https://github.com/rtaserver/luci-app-rakitiw/assets/142883865/1694190b-c025-4855-a77d-8212fab27564)
-
-            1. Upload File IPK Ke Folder Root (biar gampang)
-            2. Buka / Akses Terminal Openwrt
-            3. Stop Dan Hapus `luci-app-rakitiw` dahulu Jalankan di Terminal. Jika Fresh Install Bisa Skip Ini Lanjut No 4
-            ```
-            $ /etc/init.d/rakitiw stop
-            $ opkg remove luci-app-rakitiw
-            ```
-            4. Setelah Terhapus Jalankan Kembali Perintah ini di Terminal
-            ```
-            $ opkg update
-            $ cd /root
-            $ opkg install luci-app-rakitiw*.ipk
-            ```
-            5. Tunggu Hingga Proses Instalasi Selesai. *Pastika Ada Koneksi Internet*
-            6. Jika Gagal Install Atau Upgrade Coba Update Depends Secara Manual
-            ```
-            $ opkg update
-            $ opkg install modemmanager
-            $ opkg install python3-pip
-            $ pip3 install requests
-            $ pip3 install huawei-lte-api
-            $ opkg install luci-app-rakitiw*.ipk --force-reinstall
-            ```
-            7. Jika Proses Instalasi Berhasil Buka Modem Rakitan Di Tab Modem
-            8. Atau Bisa : http://192.168.1.1/rakitiw - Sesuaikan Dengan IP OpenWrt
-
-      - name: Delete Old Workflows
-        uses: Mattraks/delete-workflow-runs@main
-        with:
-          retain_days: 0
-          keep_minimum_runs: 1
+          tag_name: ${{needs.job_check.outputs.rakitiw_version}}
+          files: ${{ env.FIRMWARE }}/rakitiw/*.ipk
