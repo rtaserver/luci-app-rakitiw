@@ -73,7 +73,7 @@ jobs:
     needs: job_check
     permissions:
       contents: write
-    name: Build Neko
+    name: Build Rakitiw
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
