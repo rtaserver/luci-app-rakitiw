@@ -69,95 +69,71 @@ jobs:
           body_path: release.txt
 
 
-  job_build_rakitiw:
-    name: Build rakitiw[Luci ${{ matrix.luci_ver }}]
+  build_ipk:
     needs: job_check
-    if: needs.job_check.outputs.has_update == 'true'
+    permissions:
+      contents: write
+    name: Build Neko
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - sdk_ver: 21.02
-            luci_ver: 19.07
-            sdk_url: https://downloads.openwrt.org/releases/21.02.5/targets/x86/64/openwrt-sdk-21.02.5-x86-64_gcc-8.4.0_musl.Linux-x86_64.tar.xz
-
-          - sdk_ver: 23.05
-            luci_ver: 23.05
-            sdk_url: https://downloads.openwrt.org/releases/23.05.0/targets/x86/64/openwrt-sdk-23.05.0-x86-64_gcc-12.3.0_musl.Linux-x86_64.tar.xz
-
+        release:
+          - 21.02.7
+          - 23.05.0
+        arch:
+          - x86_64
+                    
     steps:
-      - name: Install packages
-        run: |
-          docker rmi `docker images -q`
-          sudo -E rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d /usr/local/lib/android
-          df -hT
-          echo "Install packages"
-          sudo -E apt-get -qq update
-          sudo -E apt-get -qq install build-essential clang flex bison g++ gawk gcc-multilib g++-multilib gettext git libncurses5-dev libssl-dev python3-distutils rsync unzip zlib1g-dev file wget
-          sudo -E apt-get -qq autoremove --purge
-          sudo -E apt-get -qq clean
-
-      - name: Cache openwrt SDK
-        id: cache-sdk
-        uses: actions/cache@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v3
         with:
-          path: sdk
-          key: openwrt-sdk-23.05-rc3-x86_64
-
-      - name: Initialization environment
-        if: steps.cache-sdk.outputs.cache-hit != 'true'
+          ref: dev
+                  
+      - name: Preparing Ralitiw
+        run: |
+              echo ""
+              mkdir feeds artifacts
+              cp -rf ./luci-app-rakitiw ./feeds
+                  
+      - name: Building Luci Rakitiw
+        uses: openwrt/gh-action-sdk@main
         env:
-          url_sdk: https://downloads.openwrt.org/releases/23.05.0/targets/x86/64/openwrt-sdk-23.05.0-x86-64_gcc-12.3.0_musl.Linux-x86_64.tar.xz
+          ARCH: ${{ matrix.arch }}-${{ matrix.release }}
+          ARTIFACTS_DIR: ${{ github.workspace }}/artifacts
+          FEED_DIR: ${{ github.workspace }}/feeds
+          PACKAGES: luci-app-rakitiw
+          NO_SHFMT_CHECK: 1
+                  
+      - name: Delivering Package
+        uses: actions/upload-artifact@v3
+        with:
+          name: luci-app-rakitiw-${{ matrix.release }}_${{ matrix.arch }}
+          path: ${{ github.workspace }}/artifacts/bin/packages/${{ matrix.arch }}/action/luci-app-rakitiw*
+          
+  push_packages:
+    needs: build_ipk
+    name: Push Packages to Release
+    permissions:
+      contents: write  # To push a branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download temporary artifact
+        uses: actions/download-artifact@v3
+                  
+      - name: Moving artifact to releases
+        shell: bash
         run: |
-          wget ${{ env.url_sdk }}
-          file_name=$(echo ${{env.url_sdk}} | awk -F/ '{print $NF}')
-          mkdir sdk && tar -xJf $file_name -C ./sdk --strip-components=1
-          cd sdk
-          echo "src-git base https://github.com/openwrt/openwrt.git;openwrt-${{ matrix.sdk_ver }}" > feeds.conf
-          echo "src-git packages https://github.com/openwrt/packages.git;openwrt-${{ matrix.sdk_ver }}" >> feeds.conf
-          echo "src-git luci https://github.com/openwrt/luci.git;openwrt-${{ matrix.luci_ver }}" >> feeds.conf
-          echo "src-git routing https://git.openwrt.org/feed/routing.git;openwrt-${{ matrix.sdk_ver }}"  >> feeds.conf
-          echo "src-git rakitiw https://github.com/${{ env.rakitiw }}.git;dev" >> feeds.conf
-          ./scripts/feeds update -a
-          echo "CONFIG_PACKAGE_luci-app-rakitiw=m" > .config
-          ./scripts/feeds install -d n luci-app-rakitiw
-          make download -j8
-
-      - name: Configure rakitiw
-        run: |
-          cd sdk
-          ./scripts/feeds update rakitiw
-          ./scripts/feeds install luci-app-rakitiw
-          echo "CONFIG_ALL_NONSHARED=n" > .config
-          echo "CONFIG_ALL_KMODS=n" >> .config
-          echo "CONFIG_ALL=n" >> .config
-          echo "CONFIG_AUTOREMOVE=n" >> .config
-
-          echo "CONFIG_PACKAGE_luci-app-rakitiw=m" >> .config
-
-          make defconfig
-
-      - name: Compile rakitiw
-        id: compile
-        run: |
-          cd sdk
-          echo "make package/luci-app-rakitiw/{clean,compile} -j$(nproc)"
-          make package/luci-app-rakitiw/{clean,compile} -j$(nproc)
-          mv bin/packages/x86_64/rakitiw/ ../
-          rm .config .config.old
-          cd ../rakitiw
-          for i in $(ls); do mv $i luci-${{ matrix.luci_ver }}_$i; done
-          cd ..
-          echo "status=success" >> $GITHUB_OUTPUT
-          echo "FIRMWARE=$PWD" >> $GITHUB_ENV
-
-      - name: Upload rakitiw ipks to release
-        uses: softprops/action-gh-release@master
-        if: steps.compile.outputs.status == 'success'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          mkdir ./release
+          cp -rf ./luci-app-rakitiw-21.02.7_x86_64/* ./release/luci-app-rakitiw_${{needs.job_check.outputs.rakitiw_version}}_all_21_02.ipk
+          cp -rf ./luci-app-rakitiw-23.05.0_x86_64/* ./release/luci-app-rakitiw_${{needs.job_check.outputs.rakitiw_version}}_all_23_05.ipk
+            
+      - name: Upload release asset
+        uses: svenstaro/upload-release-action@v2
         with:
           prerelease: true
-          tag_name: ${{needs.job_check.outputs.rakitiw_version}}
-          files: ${{ env.FIRMWARE }}/rakitiw/*.ipk
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ./release/*
+          overwrite: true
+          tag: ${{needs.job_check.outputs.rakitiw_version}}
+          file_glob: true
