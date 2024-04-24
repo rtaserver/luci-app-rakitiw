@@ -266,24 +266,25 @@ foreach ($linesnetwork as $linenetwork) {
                                                         <div class="modal-body">
                                                             <div class="form-group">
                                                                 <label for="jenis">Jenis Modem:</label><br>
-                                                                <div class="form-check form-check-inline">
+                                                                <div class="form-check form-check">
                                                                     <input class="form-check-input" type="radio"
                                                                         name="jenis" id="rakitan" value="rakitan"
                                                                         checked>
                                                                     <label class="form-check-label" for="rakitan">Modem
                                                                         Rakitan</label>
                                                                 </div>
-                                                                <div class="form-check form-check-inline">
+                                                                <div class="form-check form-check">
                                                                     <input class="form-check-input" type="radio"
                                                                         name="jenis" id="hp" value="hp">
                                                                     <label class="form-check-label" for="hp">Modem
                                                                         HP</label>
                                                                 </div>
-                                                                <div class="form-check form-check-inline">
+                                                                <div class="form-check form-check">
                                                                     <input class="form-check-input" type="radio"
-                                                                        name="jenis" id="orbit" value="orbit">
+                                                                        name="jenis" id="orbit"
+                                                                        value="huawei-orbit-stick">
                                                                     <label class="form-check-label" for="orbit">Modem
-                                                                        Orbit</label>
+                                                                        Huawei | Orbit | Stick</label>
                                                                 </div>
                                                             </div>
                                                             <div class="form-group">
@@ -294,7 +295,8 @@ foreach ($linesnetwork as $linenetwork) {
                                                             <div class="form-group" id="rakitan_field">
                                                                 <label for="apn">APN:</label>
                                                                 <input type="text" id="apn" name="apn"
-                                                                    class="form-control" placeholder="internet" value="internet">
+                                                                    class="form-control" placeholder="internet"
+                                                                    value="internet">
                                                                 <label for="interface">Interface Modem Manager:</label>
                                                                 <select name="interface" id="interface"
                                                                     class="form-control">
@@ -309,7 +311,8 @@ foreach ($linesnetwork as $linenetwork) {
                                                             <div class="form-group" id="orbit_field">
                                                                 <label for="iporbit">IP Modem:</label>
                                                                 <input type="text" id="iporbit" name="iporbit"
-                                                                    class="form-control" placeholder="192.168.8.1" value="192.168.8.1">
+                                                                    class="form-control" placeholder="192.168.8.1"
+                                                                    value="192.168.8.1">
                                                                 <label for="usernameorbit">Username:</label>
                                                                 <input type="text" id="usernameorbit"
                                                                     name="usernameorbit" class="form-control"
@@ -324,11 +327,13 @@ foreach ($linesnetwork as $linenetwork) {
                                                                     Host:</label>
                                                                 <input type="text" id="hostbug" name="hostbug"
                                                                     class="form-control"
-                                                                    placeholder="1.1.1.1 8.8.8.8 google.com" value="google.com facebook.com">
+                                                                    placeholder="1.1.1.1 8.8.8.8 google.com"
+                                                                    value="google.com facebook.com">
                                                                 <label for="devicemodem">Device Modem Untuk Cek
                                                                     PING:</label>
                                                                 <input type="text" id="devicemodem" name="devicemodem"
-                                                                    class="form-control" placeholder="eth1" value="eth1">
+                                                                    class="form-control" placeholder="eth1"
+                                                                    value="eth1">
                                                                 <label for="delayping">Jeda Waktu Detik | Sebelum
                                                                     Melanjutkan Cek PING:</label>
                                                                 <input type="text" id="delayping" name="delayping"
@@ -362,26 +367,27 @@ foreach ($linesnetwork as $linenetwork) {
                                                         <div class="modal-body">
                                                             <div class="form-group">
                                                                 <label for="edit_jenis">Jenis Modem:</label><br>
-                                                                <div class="form-check form-check-inline">
+                                                                <div class="form-check form-check">
                                                                     <input class="form-check-input" type="radio"
                                                                         name="edit_jenis" id="edit_rakitan"
                                                                         value="rakitan" disabled>
                                                                     <label class="form-check-label"
                                                                         for="edit_rakitan">Modem Rakitan</label>
                                                                 </div>
-                                                                <div class="form-check form-check-inline">
+                                                                <div class="form-check form-check">
                                                                     <input class="form-check-input" type="radio"
                                                                         name="edit_jenis" id="edit_hp" value="hp"
                                                                         disabled>
                                                                     <label class="form-check-label" for="edit_hp">Modem
                                                                         HP</label>
                                                                 </div>
-                                                                <div class="form-check form-check-inline">
+                                                                <div class="form-check form-check">
                                                                     <input class="form-check-input" type="radio"
-                                                                        name="edit_jenis" id="edit_orbit" value="orbit"
-                                                                        disabled>
+                                                                        name="edit_jenis" id="edit_orbit"
+                                                                        value="huawei-orbit-stick" disabled>
                                                                     <label class="form-check-label"
-                                                                        for="edit_orbit">Modem Orbit</label>
+                                                                        for="edit_orbit">Modem Huawei | Orbit |
+                                                                        Stick</label>
                                                                 </div>
                                                             </div>
                                                             <div class="form-group">
@@ -393,7 +399,8 @@ foreach ($linesnetwork as $linenetwork) {
                                                                 <label for="edit_apn">APN:</label>
                                                                 <input type="text" id="edit_apn" name="edit_apn"
                                                                     class="form-control" placeholder="internet">
-                                                                <label for="edit_interface">Interface Modem Manager:</label>
+                                                                <label for="edit_interface">Interface Modem
+                                                                    Manager:</label>
                                                                 <select name="edit_interface" id="edit_interface"
                                                                     class="form-control">
                                                                     <?php
