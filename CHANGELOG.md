@@ -1,3 +1,6 @@
+**Changelog** V1.2.8
+- Fix Install
+
 **Changelog** V1.2.5
 - Fix Mode Pesawat Di Modem HP
 
