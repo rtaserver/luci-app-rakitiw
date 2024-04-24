@@ -15,7 +15,6 @@ jenis_modem=()
 nama_modem=()
 apn_modem=()
 interface_modem=()
-portat_modem=()
 iporbit_modem=()
 usernameorbit_modem=()
 passwordorbit_modem=()
@@ -30,7 +29,6 @@ parse_json() {
         nama_modem[$i]=$(jq -r ".modems[$i].nama" "$json_file")
         apn_modem[$i]=$(jq -r ".modems[$i].apn" "$json_file")
         interface_modem[$i]=$(jq -r ".modems[$i].interface" "$json_file")
-        portat_modem[$i]=$(jq -r ".modems[$i].portat" "$json_file")
         iporbit_modem[$i]=$(jq -r ".modems[$i].iporbit" "$json_file")
         usernameorbit_modem[$i]=$(jq -r ".modems[$i].usernameorbit" "$json_file")
         passwordorbit_modem[$i]=$(jq -r ".modems[$i].passwordorbit" "$json_file")
@@ -47,11 +45,10 @@ perform_ping() {
     devicemodem="${4:-}"
     delayping="${5:-}"
     apn="${6:-}"
-    modemport="${7:-}"
-    interface="${8:-}"
-    iporbit="${9:-}"
-    usernameorbit="${10:-}"
-    passwordorbit="${11:-}"
+    interface="${7:-}"
+    iporbit="${8:-}"
+    usernameorbit="${9:-}"
+    passwordorbit="${10:-}"
 
     max_attempts=5
     attempt=1
@@ -93,26 +90,20 @@ perform_ping() {
             if [ "$jenis" = "rakitan" ]; then
                 log "[$jenis - $nama] Internet mati. Percobaan $attempt/$max_attempts"
                 if [ "$attempt" = "1" ]; then
-                    log "[$jenis - $nama] Melakukan Restart Interface $interface"
-                    ifdown "$interface"
+                    log "[$jenis - $nama] Mengaktifkan Mode Pesawat"
+                    echo AT+CFUN=4 | atinout - "/dev/ttyUSB0" -
+                    sleep 5
                 elif [ "$attempt" = "2" ]; then
                     log "[$jenis - $nama] Mencoba Menghubungkan Kembali Modem Dengan APN : $apn"
                     modem_info=$(mmcli -L)
                     modem_number=$(echo "$modem_info" | awk -F 'Modem/' '{print $2}' | awk '{print $1}')
                     mmcli -m "$modem_number" --simple-connect="apn=$apn"
                     ifdown "$interface"
-                    sleep 5      
+                    sleep 5
+                    ifup "$interface"
                 elif [ "$attempt" = "3" ]; then
-                    if [ -z "$cfg_nodemmanager" ]; then
-                        log "[$jenis - $nama] Mengaktifkan Mode Pesawat $modemport"
-                        echo AT+CFUN=4 | atinout - "$modemport" -
-                        sleep 4
-                        log "[$jenis - $nama] Menonaktifkan Mode Pesawat $modemport"
-                        echo AT+CFUN=1 | atinout - "$modemport" -
-                    else
-                        log "[$jenis - $nama] Restart Modem Manager"
-                        /etc/init.d/modemmanager restart
-                    fi
+                    log "[$jenis - $nama] Restart Modem Manager"
+                    /etc/init.d/modemmanager restart
                     sleep 5
                 elif [ "$attempt" = "4" ]; then
                     log "[$jenis - $nama] Mencoba Menghubungkan Kembali Modem Dengan APN : $apn"
@@ -120,15 +111,14 @@ perform_ping() {
                     modem_number=$(echo "$modem_info" | awk -F 'Modem/' '{print $2}' | awk '{print $1}')
                     mmcli -m "$modem_number" --simple-connect="apn=$apn"
                     ifdown "$interface"
-                    sleep 5      
+                    sleep 5
+                    ifup "$interface"
                 fi
-
-                ifup "$interface"
                 attempt=$((attempt + 1))
                 
                 if [ $attempt -ge $max_attempts ]; then
                     log "[$jenis - $nama] Upaya maksimal tercapai. Internet masih mati. Restart modem akan dijalankan"
-                    echo AT^RESET | atinout - "$modemport" - && sleep 20 && ifdown "$interface" && ifup "$interface"
+                    echo AT^RESET | atinout - "/dev/ttyUSB0" - && sleep 20 && ifdown "$interface" && ifup "$interface"
                     attempt=1
                 fi
             elif [ "$jenis" = "hp" ]; then
@@ -154,7 +144,7 @@ main() {
 
     # Loop through each modem and perform actions
     for ((i = 0; i < ${#jenis_modem[@]}; i++)); do
-        perform_ping "${nama_modem[$i]}" "${jenis_modem[$i]}" "${hostbug_modem[$i]}" "${devicemodem_modem[$i]}" "${delayping_modem[$i]}" "${apn_modem[$i]}" "${portat_modem[$i]}" "${interface_modem[$i]}" "${iporbit_modem[$i]}" "${usernameorbit_modem[$i]}" "${passwordorbit_modem[$i]}" &
+        perform_ping "${nama_modem[$i]}" "${jenis_modem[$i]}" "${hostbug_modem[$i]}" "${devicemodem_modem[$i]}" "${delayping_modem[$i]}" "${apn_modem[$i]}" "${interface_modem[$i]}" "${iporbit_modem[$i]}" "${usernameorbit_modem[$i]}" "${passwordorbit_modem[$i]}" &
     done
 }
 

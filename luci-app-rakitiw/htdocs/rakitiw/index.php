@@ -45,7 +45,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["tambah_modem"])) {
         "nama" => $_POST["nama"],
         "apn" => $_POST["apn"],
         "interface" => $_POST["interface"],
-        "portat" => $_POST["portat"],
         "iporbit" => $_POST["iporbit"],
         "usernameorbit" => $_POST["usernameorbit"],
         "passwordorbit" => $_POST["passwordorbit"],
@@ -64,7 +63,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["edit_modem"])) {
         $modems[$index]["nama"] = $_POST["edit_nama"];
         $modems[$index]["apn"] = $_POST["edit_apn"];
         $modems[$index]["interface"] = $_POST["edit_interface"];
-        $modems[$index]["portat"] = $_POST["edit_portat"];
         $modems[$index]["iporbit"] = $_POST["edit_iporbit"];
         $modems[$index]["usernameorbit"] = $_POST["edit_usernameorbit"];
         $modems[$index]["passwordorbit"] = $_POST["edit_passwordorbit"];
@@ -296,8 +294,8 @@ foreach ($linesnetwork as $linenetwork) {
                                                             <div class="form-group" id="rakitan_field">
                                                                 <label for="apn">APN:</label>
                                                                 <input type="text" id="apn" name="apn"
-                                                                    class="form-control" placeholder="internet">
-                                                                <label for="interface">Interface Modem:</label>
+                                                                    class="form-control" placeholder="internet" value="internet">
+                                                                <label for="interface">Interface Modem Manager:</label>
                                                                 <select name="interface" id="interface"
                                                                     class="form-control">
                                                                     <?php
@@ -307,37 +305,34 @@ foreach ($linesnetwork as $linenetwork) {
                                                                     }
                                                                     ?>
                                                                 </select>
-                                                                <label for="portat">Port Modem AT Command:</label>
-                                                                <input type="text" id="portat" name="portat"
-                                                                    class="form-control" placeholder="/dev/ttyUSB0">
                                                             </div>
                                                             <div class="form-group" id="orbit_field">
                                                                 <label for="iporbit">IP Modem:</label>
                                                                 <input type="text" id="iporbit" name="iporbit"
-                                                                    class="form-control" placeholder="192.168.8.1">
+                                                                    class="form-control" placeholder="192.168.8.1" value="192.168.8.1">
                                                                 <label for="usernameorbit">Username:</label>
                                                                 <input type="text" id="usernameorbit"
                                                                     name="usernameorbit" class="form-control"
-                                                                    placeholder="admin">
+                                                                    placeholder="admin" value="admin">
                                                                 <label for="passwordorbit">Password:</label>
                                                                 <input type="text" id="passwordorbit"
                                                                     name="passwordorbit" class="form-control"
-                                                                    placeholder="admin">
+                                                                    placeholder="admin" value="admin">
                                                             </div>
                                                             <div class="form-group">
                                                                 <label for="hostbug">Host / Bug Untuk Ping | Multi
                                                                     Host:</label>
                                                                 <input type="text" id="hostbug" name="hostbug"
                                                                     class="form-control"
-                                                                    placeholder="1.1.1.1 8.8.8.8 google.com">
+                                                                    placeholder="1.1.1.1 8.8.8.8 google.com" value="google.com facebook.com">
                                                                 <label for="devicemodem">Device Modem Untuk Cek
                                                                     PING:</label>
                                                                 <input type="text" id="devicemodem" name="devicemodem"
-                                                                    class="form-control" placeholder="eth1">
+                                                                    class="form-control" placeholder="eth1" value="eth1">
                                                                 <label for="delayping">Jeda Waktu Detik | Sebelum
                                                                     Melanjutkan Cek PING:</label>
                                                                 <input type="text" id="delayping" name="delayping"
-                                                                    class="form-control" placeholder="15">
+                                                                    class="form-control" placeholder="15" value="20">
                                                             </div>
                                                         </div>
                                                         <div class="modal-footer">
@@ -398,7 +393,7 @@ foreach ($linesnetwork as $linenetwork) {
                                                                 <label for="edit_apn">APN:</label>
                                                                 <input type="text" id="edit_apn" name="edit_apn"
                                                                     class="form-control" placeholder="internet">
-                                                                <label for="edit_interface">Interface Modem:</label>
+                                                                <label for="edit_interface">Interface Modem Manager:</label>
                                                                 <select name="edit_interface" id="edit_interface"
                                                                     class="form-control">
                                                                     <?php
@@ -408,9 +403,6 @@ foreach ($linesnetwork as $linenetwork) {
                                                                     }
                                                                     ?>
                                                                 </select>
-                                                                <label for="edit_portat">Port Modem AT Command:</label>
-                                                                <input type="text" id="edit_portat" name="edit_portat"
-                                                                    class="form-control" placeholder="/dev/ttyUSB0">
                                                             </div>
                                                             <div class="form-group" id="edit_orbit_field">
                                                                 <label for="edit_iporbit">IP Modem:</label>
@@ -471,7 +463,6 @@ foreach ($linesnetwork as $linenetwork) {
             $('#edit_nama').val(modem.nama);
             $('#edit_apn').val(modem.apn);
             $('#edit_interface').val(modem.interface);
-            $('#edit_portat').val(modem.portat);
             $('#edit_iporbit').val(modem.iporbit);
             $('#edit_usernameorbit').val(modem.usernameorbit);
             $('#edit_passwordorbit').val(modem.passwordorbit);
@@ -563,7 +554,6 @@ foreach ($linesnetwork as $linenetwork) {
             var nama = document.getElementById("nama").value.trim();
             var apn = document.getElementById("apn").value.trim();
             var interface = document.getElementById("interface").value.trim();
-            var portat = document.getElementById("portat").value.trim();
             var iporbit = document.getElementById("iporbit").value.trim();
             var usernameorbit = document.getElementById("usernameorbit").value.trim();
             var passwordorbit = document.getElementById("passwordorbit").value.trim();
@@ -581,10 +571,6 @@ foreach ($linesnetwork as $linenetwork) {
             }
             if (jenis.value === "rakitan" && apn === "") {
                 alert("APN harus diisi untuk modem rakitan!");
-                return false;
-            }
-            if (jenis.value === "rakitan" && portat === "") {
-                alert("Port modem AT Command harus diisi untuk modem rakitan!");
                 return false;
             }
             if (jenis.value === "orbit") {
@@ -612,7 +598,6 @@ foreach ($linesnetwork as $linenetwork) {
             var nama = document.getElementById("edit_nama").value.trim();
             var apn = document.getElementById("edit_apn").value.trim();
             var interface = document.getElementById("edit_interface").value.trim();
-            var portat = document.getElementById("edit_portat").value.trim();
             var iporbit = document.getElementById("edit_iporbit").value.trim();
             var usernameorbit = document.getElementById("edit_usernameorbit").value.trim();
             var passwordorbit = document.getElementById("edit_passwordorbit").value.trim();
@@ -630,10 +615,6 @@ foreach ($linesnetwork as $linenetwork) {
             }
             if (jenis.value === "rakitan" && apn === "") {
                 alert("APN harus diisi untuk modem rakitan!");
-                return false;
-            }
-            if (jenis.value === "rakitan" && portat === "") {
-                alert("Port modem AT Command harus diisi untuk modem rakitan!");
                 return false;
             }
             if (jenis.value === "orbit") {
