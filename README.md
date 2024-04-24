@@ -4,8 +4,7 @@
 </h1>
 
   <p align="center">
-	  <img src="https://img.shields.io/github/actions/workflow/status/rtaserver/luci-app-rakitiw/build-release-main.yaml?logo=openwrt&label=Build%20App
-    ">
+    <img src="https://img.shields.io/github/actions/workflow/status/rtaserver/luci-app-rakitiw/build-release-main.yaml?logo=openwrt&label=Build%20App">
     <img src="https://img.shields.io/github/v/release/rtaserver/luci-app-rakitiw?label=Release%20App">
     <img src="https://img.shields.io/github/downloads/rtaserver/luci-app-rakitiw/total?label=Downloads&color=dark-green">
   </p>
