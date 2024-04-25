@@ -7,7 +7,7 @@ include $(TOPDIR)/rules.mk
 LUCI_TITLE:=Auto Reconnect Modem Rakitan
 PKG_NAME:=luci-app-rakitiw
 LUCI_DEPENDS:=+modemmanager +python3-pip +jq +adb
-PKG_VERSION:=1.2.9
+PKG_VERSION:=1.3.0
 PKG_LICENSE:=Apache-2.0
 PKG_MAINTAINER:=Rizki Kotet <rizkidhc31@gmail.com>
 
@@ -55,8 +55,9 @@ define Package/$(PKG_NAME)/postinst
 #!/bin/sh
 	if [ -f "/tmp/rakitiw/data_modem.bak" ]; then
 		cp -rf "/tmp/rakitiw/data_modem.bak" "/www/rakitiw/data_modem.json"
-    chmod 0755 /usr/bin/rakitanmanager.sh
-    chmod 0755 /usr/bin/modem-orbit.py
+    	chmod 0755 /usr/bin/rakitanmanager.sh
+    	chmod 0755 /usr/bin/modem-orbit.py
+		chmod 0755 /etc/init.d/rakitiw
 	fi
 	exit 0
 endef

@@ -61,4 +61,8 @@ else
     log "Error: 'pip3' command not found"
 fi
 
+chmod +x /usr/bin/rakitanmanager.sh
+chmod +x /usr/bin/modem-orbit.py
+chmod +x /etc/init.d/rakitiw
+
 log "Setup Done | Modem Rakitiw Berhasil Di Install"
