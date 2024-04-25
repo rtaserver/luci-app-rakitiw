@@ -49,14 +49,20 @@ jobs:
           echo "latest_release: ${latest_release}"
           echo "has_update: ${has_update}"
 
-      - name: Prepare release
+      - name: Generate new tag & release
         if: steps.check_version.outputs.has_update == 'true'
-        run: |
-          echo "## :mega:Update content" >> release.txt
-          echo "![](https://img.shields.io/github/downloads/${{ env.rakitiw }}/${{ steps.check_version.outputs.latest_version }}/total?style=flat-square)" >> release.txt
-          echo "### rakitiw Info" >> release.txt
-          echo "**:minidisc: rakitiw Version: ${{ steps.check_version.outputs.latest_version }}**" >> release.txt
-          echo "---
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          prerelease: true
+          tag_name: ${{ steps.check_version.outputs.latest_version }}
+          body: |
+            ## :mega:Update content
+            ![](https://img.shields.io/github/downloads/${{ env.rakitiw }}/${{ steps.check_version.outputs.latest_version }}/total?style=flat-square)
+            ### rakitiw Info
+            **:minidisc: rakitiw Version: ${{ steps.check_version.outputs.latest_version }}**
+            ---
             INFORMATION TESTED
             ---
             #### Modem Rakitan:
@@ -125,18 +131,7 @@ jobs:
             8. Jika Proses Instalasi Berhasil, Buka Modem Rakitan di Tab Modem
             9. Atau Bisa: http://192.168.1.1/rakitiw - Sesuaikan dengan IP OpenWrt
             10. Jangan lupa untuk menyesuaikan langkah-langkah dengan kebutuhan dan kondisi perangkat Anda.
-            11. Pastikan Anda memiliki cadangan data penting sebelum melakukan upgrade atau instalasi baru." >> release.txt
-          touch release.txt
-
-      - name: Generate new tag & release
-        if: steps.check_version.outputs.has_update == 'true'
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          prerelease: true
-          tag_name: ${{ steps.check_version.outputs.latest_version }}
-          body_path: release.txt
+            11. Pastikan Anda memiliki cadangan data penting sebelum melakukan upgrade atau instalasi baru.
 
   build_ipk:
     needs: job_check
