@@ -1,4 +1,7 @@
 <?php
+
+$setup_status = exec("uci -q get rakitiw.cfg.setup");
+
 // Lokasi file bash
 $bash_file = '/usr/bin/rakitanmanager.sh';
 
@@ -81,6 +84,10 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET["hapus_modem"])) {
         unset($modems[$index]);
         simpanDataModem($modems);
     }
+}
+
+if (isset($_POST['setup'])) {
+    exec('/usr/bin/setuprakitiw.sh');
 }
 
 // Baca data modem
@@ -194,9 +201,13 @@ foreach ($linesnetwork as $linenetwork) {
                                             <div class="container">
                                                 <div class="row">
                                                     <div class="col-md-6">
-                                                        <button type="button" class="btn btn-primary btn-block mb-3"
-                                                            data-toggle="modal" data-target="#tambahModemModal" <?php if ($variables['modem_status'] == 'Enabled')
-                                                                echo 'disabled'; ?>>Tambah Modem</button>
+                                                    <?php if ($setup_status == "nothing"): ?>
+                                                        <form method="POST">
+                                                            <button type="submit" class="btn btn-success btn-block mb-3" name="setup">Install Depends</button>
+                                                        </form>
+                                                    <?php else: ?>
+                                                        <button type="button" class="btn btn-primary btn-block mb-3" data-toggle="modal" data-target="#tambahModemModal" <?php if ($variables['modem_status'] == 'Enabled') echo 'disabled'; ?>>Tambah Modem</button>
+                                                    <?php endif; ?>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <form method="POST">

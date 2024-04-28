@@ -66,8 +66,7 @@ perform_ping() {
 
         for pinghost in $host; do
             if [ "$devicemodem" = "" ]; then
-                ping -q -c 3 -W 3 ${pinghost} > /dev/null
-                if [ $? -eq 0 ]; then
+                if [[ $(curl -si -m 5 $pinghost | grep -c 'Date:') == "1" ]]; then
                     log "[$jenis - $nama] $pinghost dapat dijangkau"
                     status_Internet=true
                     attempt=1
@@ -75,8 +74,7 @@ perform_ping() {
                     log "[$jenis - $nama] $pinghost tidak dapat dijangkau"
                 fi
             else
-                ping -q -c 3 -W 3 -I ${devicemodem} ${pinghost} > /dev/null
-                if [ $? -eq 0 ]; then
+                if [[ $(curl -sI -m 5 --interface "$devicemodem" "$pinghost" | grep -c 'Date:') == "1" ]]; then
                     log "[$jenis - $nama] $pinghost dapat dijangkau Dengan Interface $devicemodem"
                     status_Internet=true
                     attempt=1

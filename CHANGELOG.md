@@ -1,3 +1,6 @@
+**Changelog** V1.3.0
+- Fix Startup
+
 **Changelog** V1.2.8
 - Fix Install
 

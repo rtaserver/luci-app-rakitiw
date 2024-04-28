@@ -7,7 +7,7 @@ include $(TOPDIR)/rules.mk
 LUCI_TITLE:=Auto Reconnect Modem Rakitan
 PKG_NAME:=luci-app-rakitiw
 LUCI_DEPENDS:=+modemmanager +python3-pip +jq +adb
-PKG_VERSION:=1.2.9
+PKG_VERSION:=1.3.2
 PKG_LICENSE:=Apache-2.0
 PKG_MAINTAINER:=Rizki Kotet <rizkidhc31@gmail.com>
 
@@ -31,6 +31,7 @@ define Build/Prepare
 	chmod 0755 $(PKG_BUILD_DIR)/root/etc/init.d/rakitiw
 	chmod 0755 $(PKG_BUILD_DIR)/root/usr/bin/rakitanmanager.sh
   	chmod 0755 $(PKG_BUILD_DIR)/root/usr/bin/modem-orbit.py
+	chmod 0755 $(PKG_BUILD_DIR)/root/usr/bin/setuprakitiw.sh
 	chmod 0755 $(PKG_BUILD_DIR)/root/etc/uci-defaults/99_rakitiw
 endef
 
@@ -43,9 +44,6 @@ endef
 define Package/$(PKG_NAME)/preinst
 #!/bin/sh
 	if [ -f "/www/rakitiw/data_modem.json" ]; then
-
-		cp -f "/www/rakitiw/data_modem.json" "/tmp/rakitiw/data_modem.bak"
-
 		rm -rf /www/rakitiw/ >/dev/null 2>&1
 	fi
 	exit 0
@@ -53,19 +51,16 @@ endef
 
 define Package/$(PKG_NAME)/postinst
 #!/bin/sh
-	if [ -f "/tmp/rakitiw/data_modem.bak" ]; then
-		cp -rf "/tmp/rakitiw/data_modem.bak" "/www/rakitiw/data_modem.json"
-    chmod 0755 /usr/bin/rakitanmanager.sh
+	chmod 0755 /usr/bin/rakitanmanager.sh
+	chmod 0755 /usr/bin/setuprakitiw.sh
     chmod 0755 /usr/bin/modem-orbit.py
-	fi
+	chmod 0755 /etc/init.d/rakitiw
 	exit 0
 endef
 
 define Package/$(PKG_NAME)/prerm
 #!/bin/sh
 	/usr/bin/rakitanmanager -k
-
-	cp -f "/www/rakitiw/data_modem.json" "/tmp/rakitiw/data_modem.bak"
 	exit 0
 endef
 
