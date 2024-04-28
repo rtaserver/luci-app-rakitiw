@@ -1,9 +1,10 @@
 #!/bin/bash
 # Copyright 2024 RTA SERVER
 
-if chmod +x /usr/bin/rakitanmanager.sh && \
-    chmod +x /usr/bin/modem-orbit.py && \
-    chmod +x /etc/init.d/rakitiw; then
-    echo "Permissions set successfully"
-    exit 1
-fi
+sed -i 's/\r$//' /usr/bin/setuprakitiw.sh
+sed -i 's/\r$//' /usr/bin/rakitanmanager.sh
+
+chmod 0755 /usr/bin/rakitanmanager.sh
+chmod 0755 /usr/bin/setuprakitiw.sh
+chmod 0755 /usr/bin/modem-orbit.py
+chmod 0755 /etc/init.d/rakitiw

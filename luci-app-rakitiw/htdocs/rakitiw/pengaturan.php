@@ -9,37 +9,6 @@ if (isset($_POST['rakitiw'])) {
 
 $startup_status = exec("uci -q get rakitiw.cfg.startup");
 
-function is_internet_available()
-{
-    $connected = @fsockopen("www.google.com", 80); // Coba terhubung ke situs
-    if ($connected) {
-        fclose($connected);
-        return true; // Jika terhubung, kembalikan true
-    }
-    return false; // Jika tidak terhubung, kembalikan false
-}
-
-
-function check_for_update()
-{
-    $url = "https://api.github.com/repos/rtaserver/luci-app-rakitiw/releases/latest"; // URL API untuk mendapatkan informasi terbaru
-
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_USERAGENT, 'My-App');
-    $response = curl_exec($ch);
-
-    if ($response) {
-        $data = json_decode($response, true);
-        $latest_tag = $data['tag_name']; // Mendapatkan tag terbaru
-        curl_close($ch);
-        return $latest_tag;
-    } else {
-        curl_close($ch);
-        return false;
-    }
-}
 ?>
 
 <!DOCTYPE html>
@@ -106,45 +75,6 @@ function check_for_update()
                                                 </div>
                                             </td>
                                         </form>
-                                        <br></br>
-                                        <?php
-                                        // Cek ketersediaan koneksi internet
-                                        if (is_internet_available()) {
-                                            $latest_tag = check_for_update();
-                                            if ($latest_tag) {
-                                                // Tombol untuk memunculkan modal
-                                                echo '<td class="d-grid">';
-                                                echo '<div class="btn-group col" role="group" aria-label="ctrl">';
-                                                echo '<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#versionModal">Cek Versi Terbaru</button>';
-                                                echo '</div>';
-                                                echo '</td>';
-                                                // Modal untuk menampilkan informasi versi terbaru
-                                                echo '
-                                                <div class="modal fade" id="versionModal" tabindex="-1" role="dialog" aria-labelledby="versionModalLabel" aria-hidden="true">
-                                                    <div class="modal-dialog" role="document">
-                                                        <div class="modal-content">
-                                                            <div class="modal-header">
-                                                                <h5 class="modal-title" id="versionModalLabel">Versi Terbaru</h5>
-                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                                    <span aria-hidden="true">&times;</span>
-                                                                </button>
-                                                            </div>
-                                                            <div class="modal-body">
-                                                                Versi terbaru: ' . $latest_tag . '
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>';
-                                            } else {
-                                                echo '<div class="alert alert-danger" role="alert">Gagal memeriksa update.</div>';
-                                            }
-                                        } else {
-                                            echo '<div class="alert alert-danger" role="alert">Tidak ada koneksi internet. Gagal Memeriksa Update</div>'; // Pesan jika tidak ada koneksi internet
-                                        }
-                                        ?>
                                     </div>
                                 </div>
                             </div>

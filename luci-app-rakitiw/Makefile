@@ -31,6 +31,7 @@ define Build/Prepare
 	chmod 0755 $(PKG_BUILD_DIR)/root/etc/init.d/rakitiw
 	chmod 0755 $(PKG_BUILD_DIR)/root/usr/bin/rakitanmanager.sh
   	chmod 0755 $(PKG_BUILD_DIR)/root/usr/bin/modem-orbit.py
+	chmod 0755 $(PKG_BUILD_DIR)/root/usr/bin/setuprakitiw.sh
 	chmod 0755 $(PKG_BUILD_DIR)/root/etc/uci-defaults/99_rakitiw
 endef
 
@@ -51,6 +52,7 @@ endef
 define Package/$(PKG_NAME)/postinst
 #!/bin/sh
 	chmod 0755 /usr/bin/rakitanmanager.sh
+	chmod 0755 /usr/bin/setuprakitiw.sh
     chmod 0755 /usr/bin/modem-orbit.py
 	chmod 0755 /etc/init.d/rakitiw
 	exit 0

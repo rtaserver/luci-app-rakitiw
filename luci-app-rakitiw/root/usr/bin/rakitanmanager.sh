@@ -7,148 +7,6 @@ log() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') - $1"
 }
 
-status=""
-setup_rakitiw()
-{
-if [ "$status" = "sukses" ]; then
-    log "Setup Done | Modem Rakitiw Successfully Installed"
-    exit 1
-fi
-
-# Begin setup
-log "Starting Rakitan Manager Setup"
-
-# Setup Modem Rakitiw
-log "Setup Modem Rakitiw"
-rpid=$(pgrep "rakitanmanager")
-if [[ -n $rpid ]]; then
-    kill $rpid
-fi
-
-# Setup php uhttpd
-log "Setup php uhttpd"
-if [ -f "/etc/config/uhttpd" ]; then
-    if grep -q "option index_page 'index.php'" /etc/config/uhttpd; then
-        log "uhttpd.main.index_page is already set to 'index.php'"
-    else
-        log "Setting uhttpd.main.index_page to 'index.php'..."
-        if uci set uhttpd.main.index_page='index.php' && \
-            uci commit uhttpd && \
-            /etc/init.d/uhttpd restart; then
-            log "uhttpd.main.index_page set to 'index.php' and uhttpd restarted."
-        else
-            log "Error setting uhttpd.main.index_page to 'index.php'"
-            log "Setup php uhttpd failed"
-            status="gagal"
-            exit 1
-        fi
-    fi
-
-    if grep -q "option interpreter '.php=/usr/bin/php-cgi'" /etc/config/uhttpd; then
-        log "uhttpd.main.interpreter is already set to '.php=/usr/bin/php-cgi'"
-    else
-        log "Setting uhttpd.main.interpreter to '.php=/usr/bin/php-cgi'..."
-        if uci set uhttpd.main.interpreter='.php=/usr/bin/php-cgi' && \
-            uci commit uhttpd && \
-            /etc/init.d/uhttpd restart; then
-            log "uhttpd.main.interpreter set to '.php=/usr/bin/php-cgi' and uhttpd restarted."
-        else
-            log "Error setting uhttpd.main.interpreter to '.php=/usr/bin/php-cgi'"
-            log "Setup php uhttpd failed"
-            status="gagal"
-            exit 1
-        fi
-    fi
-    log "Setup php uhttpd Done"
-else
-    log "Error: uhttpd configuration file (/etc/config/uhttpd) not found."
-    status="gagal"
-    exit 1
-fi
-
-# Setup ModemManager
-log "Setup ModemManager"
-mm1="/usr/lib/ModemManager/connection.d/10-report-down"
-mm2="/usr/lib/ModemManager/connection.d/10-report-down-and-reconnect"
-mm3="/usr/lib/ModemManager/connection.d/rakitiw"
-
-if [ -f "$mm1" ]; then
-    rm /usr/lib/ModemManager/connection.d/10-report-down
-fi
-if [ -f "$mm2" ]; then
-    rm /usr/lib/ModemManager/connection.d/10-report-down-and-reconnect
-fi
-
-if [ -f "$mm3" ]; then
-    if mv "/usr/lib/ModemManager/connection.d/rakitiw" "/usr/lib/ModemManager/connection.d/10-report-down-and-reconnect" && \
-        chmod +x /usr/lib/ModemManager/connection.d/10-report-down-and-reconnect; then
-        log "Setup ModemManager Done"
-    else
-        log "Error setting up ModemManager"
-        log "Setup ModemManager failed"
-        status="gagal"
-        exit 1
-    fi
-fi
-
-# Setup Package For Python3
-log "Setup Package For Python3"
-if which pip3 >/dev/null; then
-    # Instal paket 'requests' jika belum terinstal
-    if ! pip3 show requests >/dev/null; then
-        log "Installing package 'requests'..."
-        if pip3 install requests >>"$log_file" 2>&1; then
-            log "Package 'requests' installed successfully"
-        else
-            log "Error installing package 'requests'"
-            log "Setup Package For Python3 failed"
-            status="gagal"
-            exit 1
-        fi
-    else
-        log "Package 'requests' already installed"
-    fi
-
-    # Instal paket 'huawei-lte-api' jika belum terinstal
-    if ! pip3 show huawei-lte-api >/dev/null; then
-        log "Installing package 'huawei-lte-api'..."
-        if pip3 install huawei-lte-api >>"$log_file" 2>&1; then
-            log "Package 'huawei-lte-api' installed successfully"
-        else
-            log "Error installing package 'huawei-lte-api'"
-            log "Setup Package For Python3 failed"
-            status="gagal"
-            exit 1
-        fi
-    else
-        log "Package 'huawei-lte-api' already installed"
-    fi
-else
-    log "Error: 'pip3' command not found"
-    status="gagal"
-    exit 1
-fi
-
-# Set permissions
-log "Setting permissions"
-if chmod +x /usr/bin/rakitanmanager.sh && \
-    chmod +x /usr/bin/modem-orbit.py && \
-    chmod +x /etc/init.d/rakitiw; then
-    log "Permissions set successfully"
-else
-    log "Error setting permissions"
-    log "Setting permissions failed"
-    status="gagal"
-    exit 1
-fi
-
-status="sukses"
-# Setup completion message
-log "Setup Done | Modem Rakitiw Successfully Installed"
-exit 1
-}
-
-
 modem_status="Disabled"
 
 # Baca file JSON
@@ -208,8 +66,7 @@ perform_ping() {
 
         for pinghost in $host; do
             if [ "$devicemodem" = "" ]; then
-                ping -q -c 3 -W 3 ${pinghost} > /dev/null
-                if [ $? -eq 0 ]; then
+                if [[ $(curl -si -m 5 $pinghost | grep -c 'Date:') == "1" ]]; then
                     log "[$jenis - $nama] $pinghost dapat dijangkau"
                     status_Internet=true
                     attempt=1
@@ -217,8 +74,7 @@ perform_ping() {
                     log "[$jenis - $nama] $pinghost tidak dapat dijangkau"
                 fi
             else
-                ping -q -c 3 -W 3 -I ${devicemodem} ${pinghost} > /dev/null
-                if [ $? -eq 0 ]; then
+                if [[ $(curl -sI -m 5 --interface "$devicemodem" "$pinghost" | grep -c 'Date:') == "1" ]]; then
                     log "[$jenis - $nama] $pinghost dapat dijangkau Dengan Interface $devicemodem"
                     status_Internet=true
                     attempt=1
@@ -303,9 +159,6 @@ rakitiw_stop() {
 
 while getopts ":skrpcvh" rakitiw ; do
     case $rakitiw in
-        setup)
-            setup_rakitiw
-            ;;
         s)
             main
             ;;
