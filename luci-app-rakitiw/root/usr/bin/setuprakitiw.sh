@@ -83,4 +83,7 @@ else
 uci set rakitiw.cfg.setup='sukses'
 uci commit rakitiw
 log "Setup Done | Modem Rakitiw Berhasil Di Install"
+sleep 3
+echo -n "" > "$log_file"
+log "Clear."
 fi
