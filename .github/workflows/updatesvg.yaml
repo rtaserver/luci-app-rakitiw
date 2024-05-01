@@ -28,7 +28,6 @@ jobs:
                 echo "${{ steps.pkg_version.outputs.version }}" > version.txt
                 echo "${{ steps.pkg_version.outputs.version }}" > luci-app-rakitiw/htdocs/rakitiw/version.txt
                 TAG=$(echo "${{ steps.pkg_version.outputs.version }}")
-                echo "" > changelog.txt
                 sed -n '/^**Changelog**/,$p' CHANGELOG.md | sed -n '2p' > changelog.txt
             - name: Commit and push if it changed
               run: |
