@@ -195,15 +195,17 @@ foreach ($linesnetwork as $linenetwork) {
                         // Tampilkan modal
                         $('#updateModal').modal('show');
 
-                        $.get('https://raw.githubusercontent.com/rtaserver/luci-app-rakitiw/main/CHANGELOG.md', function (changelogData) {
-                            // Cari versi yang sesuai di Changelog
-                            var changelog = changelogData.split('**Changelog** V' + latestVersion + ' -')[1];
-                            if (changelog) {
-                                changelog = changelog.split('**Changelog** V')[0];
+                        // Load Changelog
+                        $.get('https://raw.githubusercontent.com/rtaserver/luci-app-rakitiw/main/changelog.txt', function (changelogData) {
+                            // Find the version in Changelog
+                            var versionIndex = changelogData.indexOf('**Changelog** V' + latestVersion);
+                            if (versionIndex !== -1) {
+                                // Get Changelog entries starting from the found version
+                                var changelog = changelogData.substring(versionIndex);
+                                $('#changelogContent').html(changelog);
                             } else {
-                                changelog = "Changelog tidak ditemukan untuk versi ini.";
+                                $('#changelogContent').html('Changelog not found for this version.');
                             }
-                            $('#changelogContent').html(changelog);
                         });
                     }
                 }).fail(function () {
@@ -230,7 +232,7 @@ foreach ($linesnetwork as $linenetwork) {
             </div>
             <div class="modal-body">
                 <h5>Changelog:</h5>
-                <div id="changelogContent"></div>
+                <pre id="changelogContent"></pre>
             </div>
             <div class="modal-footer">
                 <a href="https://github.com/rtaserver/luci-app-rakitiw/releases/latest" target="_blank"
