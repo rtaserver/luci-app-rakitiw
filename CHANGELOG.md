@@ -4,6 +4,10 @@
 - Fix Install
 - Fix Bug
 
+**Changelog** V1.3.2
+- Fix Script
+- Fix Bug
+
 **Changelog** V1.3.0
 - Fix Startup
 
