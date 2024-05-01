@@ -20,7 +20,8 @@ This OpenWRT Custom Script For Modem
 
 ### Wiki
 * [Home](https://github.com/rtaserver/luci-app-rakitiw/wiki)
-* [Tutorial Install](https://github.com/rtaserver/luci-app-rakitiw/wiki/Tutorial-Install)
+* [Tutorial Install Manual](https://github.com/rtaserver/luci-app-rakitiw/wiki/Tutorial-Install)
+* [Tutorial Install Auto Script](https://github.com/rtaserver/luci-app-rakitiw/releases/latest)
 ---
 INFORMATION TESTED
 ---
