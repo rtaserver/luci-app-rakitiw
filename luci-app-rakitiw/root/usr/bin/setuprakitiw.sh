@@ -9,7 +9,7 @@ log() {
 
 
 log "Setup Modem Rakitiw"
-if [[ $(uci -q get rakitiw.cfg.setup) == "nothong" ]]; then
+if [[ $(uci -q get rakitiw.cfg.setup) == "nothing" ]]; then
 
 rpid=$(pgrep "rakitanmanager")
 if [[ -n $rpid ]]; then
@@ -23,24 +23,6 @@ uci commit uhttpd
 
 /etc/init.d/uhttpd restart
 log "Setup php uhttpd Done"
-
-log "Setup ModemManager"
-mm1="/usr/lib/ModemManager/connection.d/10-report-down"
-mm2="/usr/lib/ModemManager/connection.d/10-report-down-and-reconnect"
-mm3="/usr/lib/ModemManager/connection.d/rakitiw"
-
-if [ -f "$mm1" ]; then
-    rm /usr/lib/ModemManager/connection.d/10-report-down
-fi
-if [ -f "$mm3" ]; then
-    if [ -f "$mm2" ]; then
-        rm /usr/lib/ModemManager/connection.d/10-report-down-and-reconnect
-    fi
-    mv "/usr/lib/ModemManager/connection.d/rakitiw" "/usr/lib/ModemManager/connection.d/10-report-down-and-reconnect"
-    chmod +x /usr/lib/ModemManager/connection.d/10-report-down-and-reconnect
-fi
-
-log "Setup ModemManager Done"
 
 log "Setup Package For Python3"
 if which pip3 >/dev/null; then
