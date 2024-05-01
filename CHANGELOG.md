@@ -1,3 +1,9 @@
+**Changelog** V1.3.3
+- Penambahan Port AT Command
+- Penambahan Message Update
+- Fix Install
+- Fix Bug
+
 **Changelog** V1.3.0
 - Fix Startup
 
