@@ -171,8 +171,75 @@ foreach ($linesnetwork as $linenetwork) {
                 });
             }, 1000);
         });
+        $(document).ready(function () {
+            // Fungsi untuk memeriksa koneksi internet
+            function checkConnection() {
+                return navigator.onLine;
+            }
+
+            // Fungsi untuk memeriksa pembaruan dari GitHub API
+            function checkUpdate() {
+                if (!checkConnection()) {
+                    // Jika tidak ada koneksi, hentikan proses
+                    return;
+                }
+
+                var latestVersionUrl = 'https://api.github.com/repos/rtaserver/luci-app-rakitiw/releases/latest';
+
+                $.get(latestVersionUrl, function (data) {
+                    var latestVersion = data.tag_name;
+                    var currentVersion = '<?php echo trim(file_get_contents("version.txt")); ?>';
+
+                    // Periksa jika versi terbaru berbeda dari versi saat ini
+                    if (latestVersion && latestVersion !== currentVersion) {
+                        // Tampilkan modal
+                        $('#updateModal').modal('show');
+
+                        $.get('https://raw.githubusercontent.com/rtaserver/luci-app-rakitiw/main/CHANGELOG.md', function (changelogData) {
+                            // Cari versi yang sesuai di Changelog
+                            var changelog = changelogData.split('**Changelog** V' + latestVersion + ' -')[1];
+                            if (changelog) {
+                                changelog = changelog.split('**Changelog** V')[0];
+                            } else {
+                                changelog = "Changelog tidak ditemukan untuk versi ini.";
+                            }
+                            $('#changelogContent').html(changelog);
+                        });
+                    }
+                }).fail(function () {
+                    // Jika koneksi gagal atau ada kesalahan lain dalam memeriksa pembaruan
+                    console.error('Failed to check for update.');
+                });
+            }
+
+            // Panggil fungsi untuk memeriksa pembaruan ketika dokumen selesai dimuat
+            checkUpdate();
+        });
     </script>
+
 </head>
+<div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateModalLabel">Update Available</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h5>Changelog:</h5>
+                <div id="changelogContent"></div>
+            </div>
+            <div class="modal-footer">
+                <a href="https://github.com/rtaserver/luci-app-rakitiw/releases/latest" target="_blank"
+                    class="btn btn-primary">Download Dan Update</a>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <body>
     <div id="app">
