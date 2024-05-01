@@ -23,6 +23,26 @@ hostbug_modem=()
 devicemodem_modem=()
 delayping_modem=()
 
+
+send_telegram() { #$1 Token - $2 Chat ID - $3 Nama Modem - $4 New IP
+    TOKEN="$1"
+    CHAT_ID="$2"
+    MESSAGE="====== RAKITAN MANAGER ======\nModem : $3\nNew IP : $4"
+    MESSAGE=$(echo "$MESSAGE" | sed 's/"/\\"/g')
+    curl_response=$(curl -s -X POST \
+        "https://api.telegram.org/bot$TOKEN/sendMessage" \
+        -d "chat_id=$CHAT_ID" \
+        -d "text=$MESSAGE" \
+        -H "Content-Type: application/json"
+    )
+    if [[ "$curl_response" == *"\"ok\":true"* ]]; then
+        log "Pesan telah berhasil terkirim."
+    else
+        log "Gagal mengirim pesan. Periksa token bot dan ID grup Anda."
+    fi
+}
+
+
 parse_json() {
     modems=$(jq -r '.modems | length' "$json_file")
     for ((i = 0; i < modems; i++)); do
@@ -122,6 +142,7 @@ perform_ping() {
                     echo AT^RESET | atinout - "$portmodem" - && sleep 20 && ifdown "$interface" && ifup "$interface"
                     attempt=1
                 fi
+                log "[$jenis - $nama] New IP: $(ip address | awk '/$devicemodem/ {print $2}' | sed "s/$devicemodem://")"
             elif [ "$jenis" = "hp" ]; then
                 log "[$jenis - $nama] Mencoba Menghubungkan Kembali"
                 log "[$jenis - $nama] Mengaktifkan Mode Pesawat"
@@ -130,10 +151,12 @@ perform_ping() {
                 log "[$jenis - $nama] Menonaktifkan Mode Pesawat"
                 adb shell cmd connectivity airplane-mode disable
                 sleep 7
-                adb shell ip addr show rmnet_data0 | grep 'inet ' | cut -d ' ' -f 6 | cut -d / -f 1
+                new_ip_hp=$(adb shell ip addr show rmnet_data0 | grep 'inet ' | awk '{print $2}' | cut -d / -f 1)
+                Log "[$jenis - $nama] New IP = $new_ip_hp"
             elif [ "$jenis" = "orbit" ]; then
                 log "[$jenis - $nama] Mencoba Menghubungkan Kembali Modem Orbit / Huawei"
                 python3 /usr/bin/modem-orbit.py $iporbit $usernameorbit $passwordorbit
+                log "[$jenis - $nama] New IP $(cat /tmp/ip_orbit.txt)"
             fi
         fi
         sleep "$delayping"

@@ -32,8 +32,6 @@ if which pip3 >/dev/null; then
         if ! pip3 install requests >>"$log_file" 2>&1; then
             log "Error installing package 'requests'"
             log "Setup Gagal | Mohon Coba Kembali"
-            uci set rakitiw.cfg.setup='nothing'
-            uci commit rakitiw
             exit 1  # Keluar dari skrip dengan status error
         fi
     else
@@ -46,8 +44,6 @@ if which pip3 >/dev/null; then
         if ! pip3 install huawei-lte-api >>"$log_file" 2>&1; then
             log "Error installing package 'huawei-lte-api'"
             log "Setup Gagal | Mohon Coba Kembali"
-            uci set rakitiw.cfg.setup='nothing'
-            uci commit rakitiw
             exit 1  # Keluar dari skrip dengan status error
         fi
     else
@@ -56,16 +52,9 @@ if which pip3 >/dev/null; then
 else
     log "Error: 'pip3' command not found"
     log "Setup Gagal | Mohon Coba Kembali"
-    uci set rakitiw.cfg.setup='nothing'
-    uci commit rakitiw
     exit 1  # Keluar dari skrip dengan status error
 fi
 
 else
-uci set rakitiw.cfg.setup='sukses'
-uci commit rakitiw
 log "Setup Done | Modem Rakitiw Berhasil Di Install"
-sleep 3
-echo -n "" > "$log_file"
-log "Clear."
 fi
