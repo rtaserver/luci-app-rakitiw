@@ -97,13 +97,13 @@ download_files()
     if [ $1 == "1" ]; then
         rakitiw_file_down="$(curl -s ${rakitiw_api} | grep "browser_download_url" | grep -oE "https.*${rakitiw_file}.*_21_02.ipk" | head -n 1)"
         wget -O $DIR/rakitiw.ipk ${rakitiw_file_down}
-        opkg install $DIR/rakitiw.ipk
+        opkg install $DIR/rakitiw.ipk --force-reinstall
         sleep 3
     fi
     if [ $1 == "2" ]; then
         rakitiw_file_down="$(curl -s ${rakitiw_api} | grep "browser_download_url" | grep -oE "https.*${rakitiw_file}.*_23_05.ipk" | head -n 1)"
         wget -O $DIR/rakitiw.ipk ${rakitiw_file_down}
-        opkg install $DIR/rakitiw.ipk
+        opkg install $DIR/rakitiw.ipk --force-reinstall
         sleep 3
     fi
 
