@@ -48,15 +48,16 @@ jobs:
           echo "latest_version: ${latest_version}"
           echo "latest_release: ${latest_release}"
           echo "has_update: ${has_update}"
+          zip -r Build-Dev.zip *
 
       - name: Generate new tag & release
         if: steps.check_version.outputs.has_update == 'true'
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: svenstaro/upload-release-action@v2
         with:
+          file: ./luci-app-rakitiw/Build-Dev.zip
           prerelease: true
-          tag_name: ${{ steps.check_version.outputs.latest_version }}
+          overwrite: true
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           body: |
             ## :mega:Update content | Untuk Testing
             ![](https://img.shields.io/github/downloads/${{ env.rakitiw }}/${{ steps.check_version.outputs.latest_version }}/total?style=flat-square)
