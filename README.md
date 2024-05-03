@@ -13,60 +13,19 @@
 <p align="center">
 luci-app-rakitiw
 </p>
-<p align="center">
-This OpenWRT Custom Script For Modem
-</p>
+<h3 align="center">
+discontinued
+</h3>
 <br>
 
-### Wiki
-* [Home](https://github.com/rtaserver/luci-app-rakitiw/wiki)
-* [Tutorial Install Manual](https://github.com/rtaserver/luci-app-rakitiw/wiki/Tutorial-Install)
-* [Tutorial Install Auto Script](https://github.com/rtaserver/luci-app-rakitiw/releases/latest)
----
-INFORMATION TESTED
----
-#### Modem Rakitan:
-* Dell Dw5821e
-* Fibocom L850 GL
-* Fibocom L860 GL
+# INFO
 
-#### Modem HP:
-* Semua Tipe HP Root / Non Root
-> Jangan Lupa USB Debugging Aktif
+<p style="text-align: center;"><strong>Project Terbaru Dengan Tampilan Yang Sama + Perubahan</strong></p>
+<a href="https://github.com/rtaserver/RakitanManager" style="text-align: center;"><p><strong>https://github.com/rtaserver/RakitanManager</strong></p></a>
 
-#### Modem Huawei / Orbit:
-* Huawei B310s-22
-* Huawei B312-926
-* Huawei B315s-22
-* Huawei B525s-23a
-* Huawei B525s-65a
-* Huawei B715s-23c
-* Huawei B528s
-* Huawei B535-232
-* Huawei B628-265
-* Huawei B612-233
-* Huawei B818-263
-* Huawei E5186s-22a
-* Huawei E5576-320
-* Huawei E5577Cs-321
-* Huawei E8231
-* SoyeaLink B535-333
-* Huawei E3131
-* Huawei E3372
-* Huawei E3531
-* Huawei 5G CPE Pro 2 (H122-373)
-* Huawei 5G CPE Pro (H112-372)
-
-(probably will work for other Huawei LTE devices too)
-
----
-
-<h1>Support Me 
-  <p align="center">
-	<a target="_blank" href="https://saweria.co/rizkikotet">
-    <img width="300" src="Saweria_logo.png">
-    </a>
-  </p>
-</h1>
-
-<h2 align="center"><a target="_blank" href="https://saweria.co/rizkikotet">Saweria : https://saweria.co/rizkikotet</a></h2>
+<br>
+<p style="text-align: center;"><strong>Harap Untuk Uninstall Terlebih Dahulu</strong></p>
+<p style="text-align: center;"><strong>Sebelum Menggunakan RakitanManager Yang Baru</strong></p>
+<br>
+<br>
+<h3 style="text-align: center;"><strong>Terimakasih :)</strong></h3>
